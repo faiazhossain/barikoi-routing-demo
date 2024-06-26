@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { FaDirections } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/lib/hook";
@@ -7,17 +7,22 @@ import {
   setPreviouslySelectedValue,
 } from "@/lib/features/map/mapSlice";
 import { handleSearchPlacesSelectedCountry } from "@/lib/features/api/apiSlice";
+import { setSelectAutocompleteData } from "@/lib/features/map/leftPanelSlice";
 
 function Autocomplete({ bbox }: any) {
   type Item = {
     id: number;
     name: string;
+    lat: number;
+    lng: number;
+    properties: object;
   };
   const dispatch = useAppDispatch();
   const previouslySelectedValue: any = useAppSelector(
     (state) => state?.mainmap?.previouslySelectedValue
   );
-  // const items: Item[] = [
+  const searchData: any = useAppSelector((state) => state?.mainmap?.search);
+  const [items, setItems] = useState<Item[]>([]);
 
   const handleOnSearch = (string: string) => {
     if (string !== previouslySelectedValue) {
@@ -31,16 +36,29 @@ function Autocomplete({ bbox }: any) {
         })
       );
       dispatch(setPreviouslySelectedValue(string));
+      dispatch(setSelectAutocompleteData({}));
     }
   };
-  const searchData: any = useAppSelector((state) => state?.mainmap?.search);
+
+  const handleOnClear = () => {
+    dispatch(setPreviouslySelectedValue(""));
+    dispatch(setSelectAutocompleteData({}));
+  };
 
   const handleOnHover = (result: Item) => {
-    console.log(result);
+    dispatch(
+      setMouseEnteredMarker({
+        latitude: result.lat,
+        longitude: result.lng,
+      })
+    );
+  };
+  const handleMouseLeave = () => {
+    dispatch(setMouseEnteredMarker({}));
   };
 
   const handleOnSelect = (item: Item) => {
-    console.log(item);
+    dispatch(setSelectAutocompleteData(item.properties));
   };
 
   const handleOnFocus = () => {
@@ -55,18 +73,27 @@ function Autocomplete({ bbox }: any) {
     );
   };
 
-  const items = searchData?.map((option: any) => ({
-    name: option.value,
-  }));
-
-  const mouseEntered = (lat: any, lng: any) => {
-    dispatch(setMouseEnteredMarker({ latitude: lat, longitude: lng }));
-  };
+  useEffect(() => {
+    if (searchData) {
+      const updatedItems = searchData.map((option: any) => ({
+        id: option.key,
+        name: option.value,
+        lat: option.latitude,
+        lng: option.longitude,
+        properties: option.properties,
+      }));
+      setItems(updatedItems);
+    }
+  }, [searchData]);
 
   return (
     <div className="App z-10">
       <header className="App-header">
-        <div className="mt-2 ml-2 relative" style={{ width: 400 }}>
+        <div
+          onMouseLeave={handleMouseLeave}
+          className="mt-2 ml-2 relative"
+          style={{ width: 400 }}
+        >
           <ReactSearchAutocomplete
             items={items}
             onSearch={handleOnSearch}
@@ -74,6 +101,7 @@ function Autocomplete({ bbox }: any) {
             onSelect={handleOnSelect}
             onFocus={handleOnFocus}
             autoFocus
+            onClear={handleOnClear}
             formatResult={formatResult}
             styling={{
               height: "44px",
@@ -90,9 +118,10 @@ function Autocomplete({ bbox }: any) {
               placeholderColor: "grey",
               clearIconMargin: "3px 44px 0 0",
               searchIconMargin: "0 0 0 16px",
+              zIndex: 20,
             }}
           />
-          <div className="absolute top-3 right-3 text-xl text-green-600">
+          <div className="absolute top-3 right-3 text-xl text-green-600 z-20">
             <FaDirections />
           </div>
         </div>

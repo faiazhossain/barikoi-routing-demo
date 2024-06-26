@@ -1,14 +1,20 @@
 //@ts-nocheck
 "use client";
 import React, { useRef, useEffect } from "react";
-import Map from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Autocomplete from "../Autocomplete/Autocomplete";
-import type { MapRef } from "react-map-gl";
+import Map, { Marker } from "react-map-gl/maplibre";
+import { useAppSelector } from "@/lib/hook";
+import LocationDetails from "../LeftPanelData/locationDetails";
 
 const MainMap = ({ bbox }) => {
   const mapRef = useRef<MapRef>(null);
-
+  const hoverLatLng: any = useAppSelector(
+    (state) => state?.mainmap?.mouseEnteredMarker
+  );
+  const leftPanelData: any = useAppSelector(
+    (state) => state?.leftPanel?.selectAutocompleteData
+  );
   const FitToCountry = () => {
     const onclick = () => {
       mapRef.current.fitBounds(
@@ -24,7 +30,7 @@ const MainMap = ({ bbox }) => {
         className="absolute top-2 right-2 bg-white hover:bg-purple-100 p-2 rounded-lg text-black"
         onClick={onclick}
       >
-        Fit To Country
+        Fit To {bbox.countryName}
       </button>
     );
   };
@@ -41,6 +47,14 @@ const MainMap = ({ bbox }) => {
     >
       <Autocomplete bbox={bbox} />
       <FitToCountry />
+      {hoverLatLng?.latitude && (
+        <Marker
+          longitude={hoverLatLng?.longitude}
+          latitude={hoverLatLng?.latitude}
+          anchor="bottom"
+        ></Marker>
+      )}
+      {leftPanelData?.id && <LocationDetails location={leftPanelData} />}
     </Map>
   );
 };

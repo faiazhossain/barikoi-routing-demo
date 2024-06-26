@@ -25,11 +25,11 @@ export const mapSlice = createSlice({
     setMouseEnteredMarker: (state, action) => {
       state.mouseEnteredMarker = action.payload;
     },
-    setPreviouslySelectedValue: (state, action) => {
-      state.previouslySelectedValue = action.payload;
-    },
     setSearch: (state, action) => {
       state.search = action.payload;
+    },
+    setPreviouslySelectedValue: (state, action) => {
+      state.previouslySelectedValue = action.payload;
     },
   },
 });
