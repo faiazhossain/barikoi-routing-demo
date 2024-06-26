@@ -6,7 +6,6 @@ import Autocomplete from "../Autocomplete/Autocomplete";
 import Map, { Marker } from "react-map-gl/maplibre";
 import { useAppSelector } from "@/lib/hook";
 import LocationDetails from "../LeftPanelData/locationDetails";
-import RoutingAutocomplete from "../Autocomplete/RoutingAutocomplete";
 import StyledSlider from "../Slider/StyledSlider";
 import RouteLayer from "../Layers/RouteLayer";
 
@@ -17,6 +16,13 @@ const MainMap = ({ bbox }) => {
   );
   const leftPanelData: any = useAppSelector(
     (state) => state?.leftPanel?.selectAutocompleteData
+  );
+  const selectLocationFrom: any = useAppSelector(
+    (state: any) => state?.layerSlice?.selectLocationFrom
+  );
+  console.log("🚀 ~ MainMap ~ selectLocationFrom:", selectLocationFrom);
+  const selectLocationTo: any = useAppSelector(
+    (state: any) => state?.layerSlice?.selectLocationTo
   );
   const [routingPage, setRoutingPage] = React.useState(false);
   const FitToCountry = () => {
@@ -29,6 +35,19 @@ const MainMap = ({ bbox }) => {
         { padding: 40, duration: 1000 }
       );
     };
+
+    {
+      selectLocationFrom.latitude &&
+        selectLocationTo.latitude &&
+        mapRef.current.fitBounds(
+          [
+            [selectLocationFrom.longitude, selectLocationFrom.latitude],
+            [selectLocationTo.longitude, selectLocationTo.latitude],
+          ],
+          { padding: 40, duration: 1000 }
+        );
+    }
+
     return (
       <button
         className="absolute top-2 right-2 bg-white hover:bg-purple-100 p-2 rounded-lg text-black"
