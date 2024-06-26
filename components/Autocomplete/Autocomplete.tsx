@@ -100,6 +100,8 @@ function Autocomplete({ bbox, setRouting }: any) {
             onHover={handleOnHover}
             onSelect={handleOnSelect}
             onFocus={handleOnFocus}
+            inputDebounce={250}
+            showNoResults={false}
             autoFocus
             onClear={handleOnClear}
             formatResult={formatResult}

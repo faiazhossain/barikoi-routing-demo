@@ -92,6 +92,8 @@ function RoutingAutocomplete({ uniqueId, bbox }: { uniqueId: any; bbox: any }) {
           onSelect={handleOnSelect}
           onFocus={handleOnFocus}
           autoFocus
+          inputDebounce={250}
+          showNoResults={false}
           formatResult={formatResult}
           placeholder="Search for a place"
           className={uniqueId === "start" ? "z-20" : "z-0"}
