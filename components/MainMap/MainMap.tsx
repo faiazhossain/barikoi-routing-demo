@@ -5,10 +5,12 @@ import Map from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Autocomplete from "../Autocomplete/Autocomplete";
 import type { MapRef } from "react-map-gl";
+import RoutingAutocomplete from "../Autocomplete/RoutingAutocomplete";
+import StyledSlider from "../Slider/StyledSlider";
 
 const MainMap = ({ bbox }) => {
   const mapRef = useRef<MapRef>(null);
-
+  const [routingPage, setRoutingPage] = React.useState(false);
   const FitToCountry = () => {
     const onclick = () => {
       mapRef.current.fitBounds(
@@ -39,7 +41,13 @@ const MainMap = ({ bbox }) => {
       style={{ width: "100vw", height: "100vh" }}
       mapStyle="https://tiles.barikoimaps.dev/styles/barkoi_green/style.json"
     >
-      <Autocomplete bbox={bbox} />
+      {
+        routingPage ? (
+          <StyledSlider setRouting={setRoutingPage}/>
+        ) : (
+          <Autocomplete bbox={bbox} setRouting={setRoutingPage}/>
+        )
+      }
       <FitToCountry />
     </Map>
   );

@@ -8,7 +8,7 @@ import {
 } from "@/lib/features/map/mapSlice";
 import { handleSearchPlacesSelectedCountry } from "@/lib/features/api/apiSlice";
 
-function Autocomplete({ bbox }: any) {
+function Autocomplete({ bbox ,setRouting}: any) {
   type Item = {
     id: number;
     name: string;
@@ -92,7 +92,7 @@ function Autocomplete({ bbox }: any) {
               searchIconMargin: "0 0 0 16px",
             }}
           />
-          <div className="absolute top-3 right-3 text-xl text-green-600">
+          <div className="absolute top-3 right-3 text-xl text-green-600 cursor-pointer" onClick={() => setRouting(true)}>
             <FaDirections />
           </div>
         </div>
