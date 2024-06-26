@@ -10,7 +10,7 @@ XCircle
 // import { usePathname } from "next/navigation";
 import RoutingAutocomplete from "../Autocomplete/RoutingAutocomplete";
 
-function StyledSlider({setRouting}: {setRouting: any}) {
+function StyledSlider({setRouting, bbox}:any) {
 
 return (
     <div className="flex min-h-screen w-full flex-col bg-muted/50">
@@ -28,13 +28,13 @@ return (
                     <label htmlFor="dropdown-example" className="block text-sm font-medium text-gray-700">
                         Start
                     </label>
-                    <RoutingAutocomplete uniqueId={"start"}/>
+                    <RoutingAutocomplete bbox={bbox} uniqueId={"start"}/>
                 </div>
                 <div className="my-3">
                     <label htmlFor="dropdown-example" className="block text-sm font-medium text-gray-700">
                         End
                     </label>
-                    <RoutingAutocomplete uniqueId={"end"}/>
+                    <RoutingAutocomplete bbox={bbox} uniqueId={"end"}/>
                 </div>
                 <div className="my-3">
                     <label htmlFor="dropdown-example" className="block text-sm font-medium text-gray-700">

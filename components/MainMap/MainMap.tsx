@@ -49,7 +49,7 @@ const MainMap = ({ bbox }) => {
       mapStyle="https://tiles.barikoimaps.dev/styles/barkoi_green/style.json"
     >
       {routingPage ? (
-        <StyledSlider setRouting={setRoutingPage} />
+        <StyledSlider bbox={bbox} setRouting={setRoutingPage} />
       ) : (
         <Autocomplete bbox={bbox} setRouting={setRoutingPage} />
       )}

@@ -10,6 +10,7 @@ import { handleSearchPlacesSelectedCountry } from "@/lib/features/api/apiSlice";
 import { setSelectAutocompleteData } from "@/lib/features/map/leftPanelSlice";
 
 function Autocomplete({ bbox, setRouting }: any) {
+  const [items, setItems] = useState<Item[]>([]);
   type Item = {
     id: number;
     name: string;
@@ -22,7 +23,7 @@ function Autocomplete({ bbox, setRouting }: any) {
     (state) => state?.mainmap?.previouslySelectedValue
   );
   const searchData: any = useAppSelector((state) => state?.mainmap?.search);
-  const [items, setItems] = useState<Item[]>([]);
+  
 
   const handleOnSearch = (string: string) => {
     if (string !== previouslySelectedValue) {
@@ -103,6 +104,8 @@ function Autocomplete({ bbox, setRouting }: any) {
             autoFocus
             onClear={handleOnClear}
             formatResult={formatResult}
+            inputDebounce={ 300 }
+            showNoResults={false}
             styling={{
               height: "44px",
               border: "1px solid #dfe1e5",
