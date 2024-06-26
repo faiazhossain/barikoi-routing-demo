@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import mapSlice from "./features/map/mapSlice";
 import leftPanelSlice from "./features/map/leftPanelSlice";
+import layerSlice from "./features/map/layerSlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       mainmap: mapSlice,
       leftPanel: leftPanelSlice,
+      layerSlice: layerSlice,
     },
   });
 };

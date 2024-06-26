@@ -11,8 +11,10 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.5",
     "axios": "^1.7.2",
+    "deck.gl": "^9.0.20",
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.396.0",
+    "mapbox-gl": "^3.4.0",
     "maplibre-gl": "^4.4.1",
     "next": "14.2.4",
     "react": "^18",

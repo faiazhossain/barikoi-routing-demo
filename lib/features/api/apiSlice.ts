@@ -4,6 +4,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 // import { message } from "antd";
 import { API } from "@/app.config";
 import { setSearch } from "../map/mapSlice";
+import { setOsrmKenya, setOsrmVanilla } from "../map/layerSlice";
 
 export const handleSearchPlacesSelectedCountry = createAsyncThunk(
   "search/searchPlaces",
@@ -21,6 +22,37 @@ export const handleSearchPlacesSelectedCountry = createAsyncThunk(
         latitude: Number(result?.geometry?.coordinates[1]),
       }));
       dispatch(setSearch(newOptions));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+);
+
+export const handleDistanceForOsrmVanilla = createAsyncThunk(
+  "search/searchPlaces",
+
+  async (data: any, { dispatch }) => {
+    const { selectLocationFrom, selectLocationTo } = data;
+    try {
+      const res = await axios.get(
+        `https://routing.openstreetmap.de/routed-car/route/v1/driving/${selectLocationFrom?.longitude},${selectLocationFrom?.latitude};${selectLocationTo?.longitude},${selectLocationTo?.latitude}?geometries=geojson`
+      );
+      dispatch(setOsrmVanilla(res?.data));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+);
+
+export const handleDistanceForOsrmKenya = createAsyncThunk(
+  "search/searchPlaces",
+  async (data: any, { dispatch }) => {
+    const { selectLocationFrom, selectLocationTo } = data;
+    try {
+      const res = await axios.get(
+        `https://kenya.barikoimaps.dev/route/v1/car/${selectLocationFrom?.longitude},${selectLocationFrom?.latitude};${selectLocationTo?.longitude},${selectLocationTo?.latitude}?geometries=geojson&overview=full`
+      );
+      dispatch(setOsrmKenya(res?.data));
     } catch (err) {
       console.error(err);
     }

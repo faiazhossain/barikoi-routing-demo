@@ -8,6 +8,7 @@ import { useAppSelector } from "@/lib/hook";
 import LocationDetails from "../LeftPanelData/locationDetails";
 import RoutingAutocomplete from "../Autocomplete/RoutingAutocomplete";
 import StyledSlider from "../Slider/StyledSlider";
+import RouteLayer from "../Layers/RouteLayer";
 
 const MainMap = ({ bbox }) => {
   const mapRef = useRef<MapRef>(null);
@@ -49,7 +50,7 @@ const MainMap = ({ bbox }) => {
       mapStyle="https://tiles.barikoimaps.dev/styles/barkoi_green/style.json"
     >
       {routingPage ? (
-        <StyledSlider setRouting={setRoutingPage} />
+        <StyledSlider bbox={bbox} setRouting={setRoutingPage} />
       ) : (
         <Autocomplete bbox={bbox} setRouting={setRoutingPage} />
       )}
@@ -58,10 +59,10 @@ const MainMap = ({ bbox }) => {
         <Marker
           longitude={hoverLatLng?.longitude}
           latitude={hoverLatLng?.latitude}
-          anchor="bottom"
         ></Marker>
       )}
       {leftPanelData?.id && <LocationDetails location={leftPanelData} />}
+      <RouteLayer />
     </Map>
   );
 };

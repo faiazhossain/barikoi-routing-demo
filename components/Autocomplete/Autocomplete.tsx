@@ -62,7 +62,7 @@ function Autocomplete({ bbox, setRouting }: any) {
   };
 
   const handleOnFocus = () => {
-    console.log("Focused");
+    // console.log("Focused");
   };
 
   const formatResult = (item: Item) => {
