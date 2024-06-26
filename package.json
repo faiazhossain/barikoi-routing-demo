@@ -12,6 +12,7 @@
     "@reduxjs/toolkit": "^2.2.5",
     "axios": "^1.7.2",
     "js-yaml": "^4.1.0",
+    "lucide-react": "^0.396.0",
     "maplibre-gl": "^4.4.1",
     "next": "14.2.4",
     "react": "^18",

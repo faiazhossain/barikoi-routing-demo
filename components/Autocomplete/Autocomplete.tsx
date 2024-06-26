@@ -9,7 +9,7 @@ import {
 import { handleSearchPlacesSelectedCountry } from "@/lib/features/api/apiSlice";
 import { setSelectAutocompleteData } from "@/lib/features/map/leftPanelSlice";
 
-function Autocomplete({ bbox }: any) {
+function Autocomplete({ bbox, setRouting }: any) {
   type Item = {
     id: number;
     name: string;
@@ -121,7 +121,10 @@ function Autocomplete({ bbox }: any) {
               zIndex: 20,
             }}
           />
-          <div className="absolute top-3 right-3 text-xl text-green-600 z-20">
+          <div
+            className="absolute top-3 right-3 text-xl text-green-600 cursor-pointer z-20"
+            onClick={() => setRouting(true)}
+          >
             <FaDirections />
           </div>
         </div>
