@@ -8,6 +8,11 @@ import { useAppSelector } from "@/lib/hook";
 import LocationDetails from "../LeftPanelData/locationDetails";
 import StyledSlider from "../Slider/StyledSlider";
 import RouteLayer from "../Layers/RouteLayer";
+import Markers from "../Markers/Markers";
+import {
+  setSelectLocationFrom,
+  setSelectLocationTo,
+} from "@/lib/features/map/layerSlice";
 
 const MainMap = ({ bbox }) => {
   const mapRef = useRef<MapRef>(null);
@@ -20,11 +25,23 @@ const MainMap = ({ bbox }) => {
   const selectLocationFrom: any = useAppSelector(
     (state: any) => state?.layerSlice?.selectLocationFrom
   );
-  console.log("🚀 ~ MainMap ~ selectLocationFrom:", selectLocationFrom);
   const selectLocationTo: any = useAppSelector(
     (state: any) => state?.layerSlice?.selectLocationTo
   );
   const [routingPage, setRoutingPage] = React.useState(false);
+
+  useEffect(() => {
+    if (selectLocationFrom.latitude && selectLocationTo.latitude) {
+      mapRef.current.fitBounds(
+        [
+          [selectLocationFrom.longitude, selectLocationFrom.latitude],
+          [selectLocationTo.longitude, selectLocationTo.latitude],
+        ],
+        { padding: 40, duration: 1000 }
+      );
+    }
+  }, [selectLocationFrom, selectLocationTo]);
+
   const FitToCountry = () => {
     const onclick = () => {
       mapRef.current.fitBounds(
@@ -36,18 +53,6 @@ const MainMap = ({ bbox }) => {
       );
     };
 
-    {
-      selectLocationFrom.latitude &&
-        selectLocationTo.latitude &&
-        mapRef.current.fitBounds(
-          [
-            [selectLocationFrom.longitude, selectLocationFrom.latitude],
-            [selectLocationTo.longitude, selectLocationTo.latitude],
-          ],
-          { padding: 40, duration: 1000 }
-        );
-    }
-
     return (
       <button
         className="absolute top-2 right-2 bg-white hover:bg-purple-100 p-2 rounded-lg text-black"
@@ -57,6 +62,7 @@ const MainMap = ({ bbox }) => {
       </button>
     );
   };
+
   return (
     <Map
       ref={mapRef}
@@ -74,12 +80,7 @@ const MainMap = ({ bbox }) => {
         <Autocomplete bbox={bbox} setRouting={setRoutingPage} />
       )}
       <FitToCountry />
-      {hoverLatLng?.latitude && (
-        <Marker
-          longitude={hoverLatLng?.longitude}
-          latitude={hoverLatLng?.latitude}
-        ></Marker>
-      )}
+      <Markers />
       {leftPanelData?.id && <LocationDetails location={leftPanelData} />}
       <RouteLayer />
     </Map>

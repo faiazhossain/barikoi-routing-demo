@@ -7,6 +7,11 @@ import {
   handleDistanceForOsrmKenya,
   handleDistanceForOsrmVanilla,
 } from "@/lib/features/api/apiSlice";
+import {
+  setOsrmVanilla,
+  setSelectLocationFrom,
+  setSelectLocationTo,
+} from "@/lib/features/map/layerSlice";
 
 function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
   const dispatch = useAppDispatch();
@@ -34,6 +39,13 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
     );
   }, [selectLocationFrom, selectLocationTo]);
 
+  const handleCloseClick = () => {
+    setRouting(false);
+    dispatch(setSelectLocationFrom({}));
+    dispatch(setSelectLocationTo({}));
+    dispatch(setOsrmVanilla({}));
+  };
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/50">
       <aside
@@ -49,7 +61,7 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
                 </span>{" "}
                 <XCircle
                   className="h-8 w-4 my-auto ml-14 text-red-500"
-                  onClick={() => setRouting(false)}
+                  onClick={handleCloseClick}
                 />{" "}
               </div>
               <hr />

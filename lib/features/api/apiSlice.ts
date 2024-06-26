@@ -35,7 +35,7 @@ export const handleDistanceForOsrmVanilla = createAsyncThunk(
     const { selectLocationFrom, selectLocationTo } = data;
     try {
       const res = await axios.get(
-        `https://routing.openstreetmap.de/routed-car/route/v1/driving/${selectLocationFrom?.longitude},${selectLocationFrom?.latitude};${selectLocationTo?.longitude},${selectLocationTo?.latitude}?geometries=geojson`
+        `https://routing.openstreetmap.de/routed-car/route/v1/driving/${selectLocationFrom?.longitude},${selectLocationFrom?.latitude};${selectLocationTo?.longitude},${selectLocationTo?.latitude}?geometries=geojson&overview=full`
       );
       dispatch(setOsrmVanilla(res?.data));
     } catch (err) {

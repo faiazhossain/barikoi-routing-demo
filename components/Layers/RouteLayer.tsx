@@ -21,9 +21,6 @@ const RouteLayer = () => {
   const OsrmVanilla =
     osrmVanilla?.routes?.length > 0 ? osrmVanilla?.routes[0]?.geometry : null;
 
-  const OsrmKenya =
-    osrmKenya?.routes?.length > 0 ? osrmKenya?.routes[0]?.geometry : null;
-
   console.log("🚀 ~ RouteLayer ~ OsrmVanilla:", OsrmVanilla);
   // const geoJsonDataGoogle = googleData?.decodedPolyline
   //   ? googleData?.decodedPolyline
@@ -49,23 +46,23 @@ const RouteLayer = () => {
       wireframe: true,
     }),
 
-    // new GeoJsonLayer({
-    //   id: "geojson-layer2",
-    //   data: geoJsonData,
-    //   pickable: true,
-    //   stroked: true,
-    //   filled: true,
-    //   extruded: true,
-    //   pointType: "circle",
-    //   lineWidthScale: 20,
-    //   lineWidthMaxPixels: 5,
-    //   lineWidthMinPixels: 3,
-    //   getLineColor: [44, 176, 254],
-    //   getPointRadius: 100,
-    //   getLineWidth: 4,
-    //   getElevation: 30,
-    //   wireframe: true,
-    // }),
+    new GeoJsonLayer({
+      id: "geojson-layer2",
+      data: OsrmVanilla,
+      pickable: true,
+      stroked: true,
+      filled: true,
+      extruded: true,
+      pointType: "circle",
+      lineWidthScale: 20,
+      lineWidthMaxPixels: 5,
+      lineWidthMinPixels: 3,
+      getLineColor: [44, 176, 254],
+      getPointRadius: 100,
+      getLineWidth: 4,
+      getElevation: 30,
+      wireframe: true,
+    }),
 
     // // distance matrix layers for kenya
     // new GeoJsonLayer({
