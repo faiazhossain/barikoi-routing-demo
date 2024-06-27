@@ -4,6 +4,8 @@ import { XCircle } from "lucide-react";
 import RoutingAutocomplete from "../Autocomplete/RoutingAutocomplete";
 import { useAppDispatch, useAppSelector } from "@/lib/hook";
 import {
+  handleDistanceForGH,
+  handleDistanceForGoogle,
   handleDistanceForOsrmKenya,
   handleDistanceForOsrmVanilla,
 } from "@/lib/features/api/apiSlice";
@@ -31,12 +33,26 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
     } else {
       setIsDropdownEnabled(false);
     }
-    dispatch(
-      handleDistanceForOsrmVanilla({
-        selectLocationFrom,
-        selectLocationTo,
-      })
-    );
+    if (selectLocationFrom?.latitude && selectLocationTo?.latitude) {
+      dispatch(
+        handleDistanceForOsrmVanilla({
+          selectLocationFrom,
+          selectLocationTo,
+        })
+      )
+      dispatch(
+        handleDistanceForGH({
+          selectLocationFrom,
+          selectLocationTo,
+        })
+      )
+      dispatch(
+        handleDistanceForGoogle({
+          selectLocationFrom,
+          selectLocationTo,
+        })
+      )
+    }
   }, [selectLocationFrom, selectLocationTo]);
 
   const handleCloseClick = () => {

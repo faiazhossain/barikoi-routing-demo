@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // Define a type for the slice state
 export interface LayerSlice {
   osrmVanilla: Object;
+  googleData: Object;
   osrmKenya: Object;
   selectLocationFrom: Object;
   selectLocationTo: Object;
@@ -12,6 +13,7 @@ export interface LayerSlice {
 // Define the initial state using that type
 const initialState: LayerSlice = {
   osrmVanilla: {},
+  googleData: {},
   osrmKenya: {},
   selectLocationFrom: {},
   selectLocationTo: {},
@@ -28,6 +30,9 @@ export const layerSlice = createSlice({
     setOsrmKenya: (state, action) => {
       state.osrmKenya = action.payload;
     },
+    setGoogleData: (state, action) => {
+      state.googleData = action.payload;
+    },
     setSelectLocationFrom: (state, action) => {
       state.selectLocationFrom = action.payload;
     },
@@ -40,6 +45,7 @@ export const layerSlice = createSlice({
 export const {
   setOsrmVanilla,
   setOsrmKenya,
+  setGoogleData,
   setSelectLocationFrom,
   setSelectLocationTo,
 } = layerSlice.actions;
