@@ -20,6 +20,14 @@ const RouteLayer = () => {
 
   const OsrmVanilla =
     osrmVanilla?.routes?.length > 0 ? osrmVanilla?.routes[0]?.geometry : null;
+  
+  const googleData = useAppSelector(
+    (state) => state?.layerSlice?.googleData ?? null
+  );
+
+  const geoJsonDataGoogle = googleData?.decodedPolyline
+    ? googleData?.decodedPolyline
+    : null;
 
   console.log("🚀 ~ RouteLayer ~ OsrmVanilla:", OsrmVanilla);
   // const geoJsonDataGoogle = googleData?.decodedPolyline
@@ -105,25 +113,25 @@ const RouteLayer = () => {
     // }),
 
     // // distance matrix layers for Google
-    // new GeoJsonLayer({
-    //   id: "geojson-layer5",
-    //   data: geoJsonDataGoogle,
-    //   pickable: true,
-    //   stroked: true,
-    //   filled: true,
-    //   extruded: true,
-    //   pointType: "circle",
-    //   lineWidthScale: 16,
-    //   lineWidthMaxPixels: 6,
-    //   lineWidthMinPixels: 4,
-    //   // strokeColor: [55, 103, 210],
-    //   getLineColor: [255, 0, 0],
-    //   getPointRadius: 100,
-    //   getLineWidth: 22,
-    //   getElevation: 30,
-    //   wireframe: true,
-    //   opacity: 0.8,
-    // }),
+    new GeoJsonLayer({
+      id: "geojson-layer5",
+      data: geoJsonDataGoogle,
+      pickable: true,
+      stroked: true,
+      filled: true,
+      extruded: true,
+      pointType: "circle",
+      lineWidthScale: 16,
+      lineWidthMaxPixels: 6,
+      lineWidthMinPixels: 4,
+      // strokeColor: [55, 103, 210],
+      getLineColor: [255, 0, 0],
+      getPointRadius: 100,
+      getLineWidth: 22,
+      getElevation: 30,
+      wireframe: true,
+      opacity: 0.8,
+    }),
   ];
 
   return (

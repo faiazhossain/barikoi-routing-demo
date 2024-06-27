@@ -181,6 +181,7 @@ export const handleDistanceForGoogle = createAsyncThunk(
           route.polyline.encodedPolyline
         );
         dispatch(setGoogleData({ ...route, decodedPolyline }));
+        console.log({ ...route, decodedPolyline });
       }
       return responseData;
     } catch (error) {
