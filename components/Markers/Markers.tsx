@@ -7,6 +7,9 @@ const Markers = () => {
   const hoverLatLng: any = useAppSelector(
     (state) => state?.mainmap?.mouseEnteredMarker
   );
+  const selectedMarker: any = useAppSelector(
+    (state) => state?.mainmap?.selectedMarker
+  )
   const selectLocationFrom: any = useAppSelector(
     (state: any) => state?.layerSlice?.selectLocationFrom
   );
@@ -35,6 +38,12 @@ const Markers = () => {
         <Marker
           longitude={hoverLatLng?.longitude}
           latitude={hoverLatLng?.latitude}
+        ></Marker>
+      )}
+      {selectedMarker?.latitude && (
+        <Marker
+          longitude={selectedMarker?.longitude}
+          latitude={selectedMarker?.latitude}
         ></Marker>
       )}
     </>

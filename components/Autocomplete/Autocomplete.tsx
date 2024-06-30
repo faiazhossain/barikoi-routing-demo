@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hook";
 import {
   setMouseEnteredMarker,
   setPreviouslySelectedValue,
+  setSelectedMarker,
 } from "@/lib/features/map/mapSlice";
 import { handleSearchPlacesSelectedCountry } from "@/lib/features/api/apiSlice";
 import { setSelectAutocompleteData } from "@/lib/features/map/leftPanelSlice";
@@ -43,6 +44,7 @@ function Autocomplete({ bbox, setRouting }: any) {
   const handleOnClear = () => {
     dispatch(setPreviouslySelectedValue(""));
     dispatch(setSelectAutocompleteData({}));
+    dispatch(setSelectedMarker({}));
   };
 
   const handleOnHover = (result: Item) => {
@@ -59,6 +61,12 @@ function Autocomplete({ bbox, setRouting }: any) {
 
   const handleOnSelect = (item: Item) => {
     dispatch(setSelectAutocompleteData(item.properties));
+    dispatch(
+      setSelectedMarker({
+        longitude: item?.lng,
+        latitude: item?.lat,
+      })
+    );
   };
 
   const handleOnFocus = () => {
@@ -125,7 +133,11 @@ function Autocomplete({ bbox, setRouting }: any) {
           />
           <div
             className="absolute top-3 right-3 text-xl text-green-600 cursor-pointer z-20"
-            onClick={() => setRouting(true)}
+            onClick={() => {
+              setRouting(true);
+              dispatch(setSelectedMarker({}));
+              dispatch(setSelectAutocompleteData({}));
+            }}
           >
             <FaDirections />
           </div>

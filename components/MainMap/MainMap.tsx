@@ -1,6 +1,6 @@
 //@ts-nocheck
 "use client";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, use } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Autocomplete from "../Autocomplete/Autocomplete";
 import Map, { Marker } from "react-map-gl/maplibre";
@@ -9,15 +9,15 @@ import LocationDetails from "../LeftPanelData/locationDetails";
 import StyledSlider from "../Slider/StyledSlider";
 import RouteLayer from "../Layers/RouteLayer";
 import Markers from "../Markers/Markers";
-import {
-  setSelectLocationFrom,
-  setSelectLocationTo,
-} from "@/lib/features/map/layerSlice";
+
 
 const MainMap = ({ bbox }) => {
   const mapRef = useRef<MapRef>(null);
   const hoverLatLng: any = useAppSelector(
     (state) => state?.mainmap?.mouseEnteredMarker
+  );
+  const selectedMarker: any = useAppSelector(
+    (state) => state?.mainmap?.selectedMarker
   );
   const leftPanelData: any = useAppSelector(
     (state) => state?.leftPanel?.selectAutocompleteData
@@ -42,6 +42,12 @@ const MainMap = ({ bbox }) => {
     }
   }, [selectLocationFrom, selectLocationTo]);
 
+  useEffect(() => {
+    if (selectedMarker?.latitude && selectedMarker?.longitude) {
+      console.log(selectedMarker);
+      mapRef.current?.flyTo({ center: [selectedMarker.longitude, selectedMarker.latitude], zoom: 15 });
+    }
+  }, [selectedMarker]);
   const FitToCountry = () => {
     const onclick = () => {
       mapRef.current.fitBounds(

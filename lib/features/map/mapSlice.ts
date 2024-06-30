@@ -5,6 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export interface MapSlice {
   value: number;
   mouseEnteredMarker: object;
+  selectedMarker: object;
   search: object;
   previouslySelectedValue: string;
 }
@@ -13,6 +14,7 @@ export interface MapSlice {
 const initialState: MapSlice = {
   value: 0,
   mouseEnteredMarker: {},
+  selectedMarker: {},
   previouslySelectedValue: "",
   search: [],
 };
@@ -25,6 +27,9 @@ export const mapSlice = createSlice({
     setMouseEnteredMarker: (state, action) => {
       state.mouseEnteredMarker = action.payload;
     },
+    setSelectedMarker: (state, action) => {
+      state.selectedMarker = action.payload;
+    },
     setSearch: (state, action) => {
       state.search = action.payload;
     },
@@ -34,7 +39,7 @@ export const mapSlice = createSlice({
   },
 });
 
-export const { setMouseEnteredMarker, setPreviouslySelectedValue, setSearch } =
+export const { setMouseEnteredMarker, setSelectedMarker, setPreviouslySelectedValue, setSearch } =
   mapSlice.actions;
 
 export const selectMap = (state: RootState) => state.mainmap.value;
