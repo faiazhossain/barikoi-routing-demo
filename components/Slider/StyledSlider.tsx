@@ -97,7 +97,13 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
     dispatch(setGoogleData({}));
     setIsDropdownEnabled(false);
   };
-console.log(osrmVanilla, googleData, "🚀 ~ file: StyledSlider.tsx:StyledSlider ~ osrmVanilla:", osrmVanilla);
+ 
+  const routes = [
+    { value: "osrm", label: "OSRM" },
+    { value: "gh", label: "GraphHopper" },
+    { value: "vh", label: "Valhalla" },
+    { value: "google", label: "Google" },
+  ];
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/50">
       <aside
@@ -153,10 +159,11 @@ console.log(osrmVanilla, googleData, "🚀 ~ file: StyledSlider.tsx:StyledSlider
               disabled={!isDropdownEnabled}
             >
               <option value="">Select route</option>
-              <option value="osrm">OSRM</option>
-              <option value="gh">GraphHopper</option>
-              <option value="vh">Valhalla</option>
-              <option value="google">Google</option>
+              {routes.map((route) => (
+                <option key={route.value} value={route.value}>
+                  {route.label}
+                </option>
+              ))}
             </select>
           </div>
         </nav>

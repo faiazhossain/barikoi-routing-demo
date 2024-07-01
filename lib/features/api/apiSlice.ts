@@ -25,7 +25,7 @@ export const handleBbox = createAsyncThunk(
 
       dispatch(setBbox(formatedResults));
       // dispatch(setSearch(formatedResults));
-      console.log(formatedResults, "bbox");
+      // console.log(formatedResults, "bbox");
     } catch (err) {
       console.error(err, "bbox error");
     }
@@ -207,7 +207,7 @@ export const handleDistanceForGoogle = createAsyncThunk(
           route.polyline.encodedPolyline
         );
         dispatch(setGoogleData({ ...route, decodedPolyline }));
-        console.log({ ...route, decodedPolyline });
+        console.log({ ...route, decodedPolyline }, "decoded polyline");
       }
       return responseData;
     } catch (error) {

@@ -36,8 +36,7 @@ const MainMap = () => {
   // get bbox for selected country
   useEffect(() => {
     dispatch(handleBbox({}));
-    // handleBbox();
-    console.log('from useEffect', bbox);
+    // console.log('from useEffect', bbox);
   }, []);
   // fit bounds to selected locations
   useEffect(() => {
