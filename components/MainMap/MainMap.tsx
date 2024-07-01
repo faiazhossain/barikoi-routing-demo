@@ -4,15 +4,18 @@ import React, { useRef, useEffect, use } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Autocomplete from "../Autocomplete/Autocomplete";
 import Map, { Marker } from "react-map-gl/maplibre";
-import { useAppSelector } from "@/lib/hook";
+import { useAppDispatch, useAppSelector } from "@/lib/hook";
 import LocationDetails from "../LeftPanelData/locationDetails";
 import StyledSlider from "../Slider/StyledSlider";
 import RouteLayer from "../Layers/RouteLayer";
 import Markers from "../Markers/Markers";
+import { handleBbox } from "@/lib/features/api/apiSlice";
 
 
-const MainMap = ({ bbox }) => {
+const MainMap = () => {
   const mapRef = useRef<MapRef>(null);
+  const dispatch = useAppDispatch();
+  const bbox: any = useAppSelector((state) => state?.mainmap?.bbox);
   const hoverLatLng: any = useAppSelector(
     (state) => state?.mainmap?.mouseEnteredMarker
   );
@@ -30,6 +33,13 @@ const MainMap = ({ bbox }) => {
   );
   const [routingPage, setRoutingPage] = React.useState(false);
 
+  // get bbox for selected country
+  useEffect(() => {
+    dispatch(handleBbox({}));
+    // handleBbox();
+    console.log('from useEffect', bbox);
+  }, []);
+  // fit bounds to selected locations
   useEffect(() => {
     if (selectLocationFrom.latitude && selectLocationTo.latitude) {
       mapRef.current.fitBounds(
@@ -42,12 +52,15 @@ const MainMap = ({ bbox }) => {
     }
   }, [selectLocationFrom, selectLocationTo]);
 
+  // fly to selected marker
   useEffect(() => {
     if (selectedMarker?.latitude && selectedMarker?.longitude) {
       console.log(selectedMarker);
       mapRef.current?.flyTo({ center: [selectedMarker.longitude, selectedMarker.latitude], zoom: 15 });
     }
   }, [selectedMarker]);
+
+  // fit bounds to selected country
   const FitToCountry = () => {
     const onclick = () => {
       mapRef.current.fitBounds(

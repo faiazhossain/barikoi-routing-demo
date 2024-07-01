@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // Define a type for the slice state
 export interface MapSlice {
   value: number;
+  bbox: object;
   mouseEnteredMarker: object;
   selectedMarker: object;
   search: object;
@@ -13,6 +14,7 @@ export interface MapSlice {
 // Define the initial state using that type
 const initialState: MapSlice = {
   value: 0,
+  bbox: {},
   mouseEnteredMarker: {},
   selectedMarker: {},
   previouslySelectedValue: "",
@@ -24,6 +26,9 @@ export const mapSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
+    setBbox: (state, action) => {
+      state.bbox = action.payload;
+    },
     setMouseEnteredMarker: (state, action) => {
       state.mouseEnteredMarker = action.payload;
     },
@@ -39,7 +44,7 @@ export const mapSlice = createSlice({
   },
 });
 
-export const { setMouseEnteredMarker, setSelectedMarker, setPreviouslySelectedValue, setSearch } =
+export const { setBbox, setMouseEnteredMarker, setSelectedMarker, setPreviouslySelectedValue, setSearch } =
   mapSlice.actions;
 
 export const selectMap = (state: RootState) => state.mainmap.value;

@@ -3,11 +3,36 @@ import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 // import { message } from "antd";
 import { API } from "@/app.config";
-import { setSearch } from "../map/mapSlice";
+import { setBbox, setSearch } from "../map/mapSlice";
 import { setGoogleData, setOsrmKenya, setOsrmVanilla } from "../map/layerSlice";
 import { messageError } from "@/components/AlertMessage";
 var polyline = require("@mapbox/polyline");
 
+export const handleBbox = createAsyncThunk(
+  "search/searchPlaces",
+  async ({}, { dispatch }) => {
+    try {
+      const url = `${API.BBOX}`;
+      const res = await axios.get(url);
+      const results: any[] = res?.data?.items;
+      const formatedResults: any = {
+        minLat: results[0]?.bbox?.minLat,
+        minLon: results[0]?.bbox?.minLon,
+        maxLat: results[0]?.bbox?.maxLat,
+        maxLon: results[0]?.bbox?.maxLon,
+        countryName: results[0]?.country_name,
+      };
+
+      dispatch(setBbox(formatedResults));
+      // dispatch(setSearch(formatedResults));
+      console.log(formatedResults, "bbox");
+    } catch (err) {
+      console.error(err, "bbox error");
+    }
+  }
+)
+
+// autocomplete specific country
 export const handleSearchPlacesSelectedCountry = createAsyncThunk(
   "search/searchPlaces",
   async ({ value, minLon, minLat, maxLon, maxLat }: any, { dispatch }) => {
@@ -30,6 +55,7 @@ export const handleSearchPlacesSelectedCountry = createAsyncThunk(
   }
 );
 
+// osrm
 export const handleDistanceForOsrmVanilla = createAsyncThunk(
   "search/searchPlaces",
 
