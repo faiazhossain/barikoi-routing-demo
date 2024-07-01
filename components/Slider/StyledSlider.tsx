@@ -4,11 +4,7 @@ import { XCircle } from "lucide-react";
 import RoutingAutocomplete from "../Autocomplete/RoutingAutocomplete";
 import { useAppDispatch, useAppSelector } from "@/lib/hook";
 import {
-  handleDistanceForGH,
-  handleDistanceForGoogle,
-  handleDistanceForOsrmKenya,
-  handleDistanceForOsrmVanilla,
-  handleDistanceForValHalla,
+  handleRoutes,
 } from "@/lib/features/api/apiSlice";
 import {
   setGoogleData,
@@ -31,6 +27,9 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
   const googleData = useAppSelector(
     (state) => state?.layerSlice?.googleData ?? null 
   ) as { duration: any, distanceMeters: number };
+  const routingApis = useAppSelector(
+    (state) => state?.mainmap?.routingApis
+  )
   const [routeType, setRouteType] = useState("");
   const [isDropdownEnabled, setIsDropdownEnabled] = useState(false);
 
@@ -41,51 +40,37 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
       setIsDropdownEnabled(false);
     }
     if (selectLocationFrom?.latitude && selectLocationTo?.latitude) {
-      dispatch(
-        handleDistanceForOsrmVanilla({
-          selectLocationFrom,
-          selectLocationTo,
-        })
-      )
-      dispatch(
-        handleDistanceForGH({
-          selectLocationFrom,
-          selectLocationTo,
-        })
-      )
-      dispatch(
-        handleDistanceForGoogle({
-          selectLocationFrom,
-          selectLocationTo,
-        })
-      )
+      dispatch(handleRoutes({ selectLocationFrom, selectLocationTo, routingApis, routeType }));
     }
-  }, [selectLocationFrom, selectLocationTo]);
+  }, [selectLocationFrom, selectLocationTo, routeType]);
 
   const handleRouteTypeChange = (e: any) => {
     setRouteType(e.target.value);
     if (e.target.value === "gh") {
-      dispatch(handleDistanceForGH({ selectLocationFrom, selectLocationTo }));
+      // dispatch(handleDistanceForGH({ selectLocationFrom, selectLocationTo }));
       dispatch(setGoogleData({}));
       dispatch(setOsrmVanilla({}));
     } else if (e.target.value === "vh") {
-      dispatch(
-        handleDistanceForValHalla({ selectLocationFrom, selectLocationTo })
-      );
+      // dispatch(
+      //   handleDistanceForValHalla({ selectLocationFrom, selectLocationTo })
+      // );
       dispatch(setGoogleData({}));
       dispatch(setOsrmVanilla({}));
-    } else if (e.target.value === "google") {
-      dispatch(
-        handleDistanceForGoogle({ selectLocationFrom, selectLocationTo })
-      );
+    // } else if (e.target.value === "google") {
+    //   dispatch(
+    //     handleDistanceForGoogle({ selectLocationFrom, selectLocationTo })
+    //   );
       // dispatch(setGoogleData({}));
       dispatch(setOsrmVanilla({}));
     }else if (e.target.value === "osrm") {
-      dispatch(
-        handleDistanceForOsrmVanilla({ selectLocationFrom, selectLocationTo })
-      );
+      // dispatch(
+      //   handleDistanceForOsrmVanilla({ selectLocationFrom, selectLocationTo })
+      // );
       dispatch(setGoogleData({}));
       // dispatch(setOsrmVanilla({}));
+    }else if (e.target.value === "google") {
+      dispatch(setOsrmVanilla({}));
+      // dispatch(setGoogleData({}));
     }
   };
 
@@ -158,10 +143,10 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
               onChange={handleRouteTypeChange}
               disabled={!isDropdownEnabled}
             >
-              <option value="">Select route</option>
-              {routes.map((route) => (
-                <option key={route.value} value={route.value}>
-                  {route.label}
+              <option value="">All</option>
+              {routingApis.map((route: any) => (
+                <option key={route?.id} value={route?.api_name}>
+                  {route?.label}
                 </option>
               ))}
             </select>

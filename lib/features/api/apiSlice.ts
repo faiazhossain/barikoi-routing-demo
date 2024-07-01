@@ -3,7 +3,7 @@ import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 // import { message } from "antd";
 import { API } from "@/app.config";
-import { setBbox, setSearch } from "../map/mapSlice";
+import { setBbox, setRoutingApis, setSearch } from "../map/mapSlice";
 import { setGoogleData, setOsrmKenya, setOsrmVanilla } from "../map/layerSlice";
 import { messageError } from "@/components/AlertMessage";
 var polyline = require("@mapbox/polyline");
@@ -24,8 +24,13 @@ export const handleBbox = createAsyncThunk(
       };
 
       dispatch(setBbox(formatedResults));
-      // dispatch(setSearch(formatedResults));
-      // console.log(formatedResults, "bbox");
+
+      // Add another API call here
+      const routingUrl = `${API.ROUTING_API}`;
+      const routingRes = await axios.get(routingUrl);
+      dispatch(setRoutingApis(routingRes?.data?.items));
+      console.log(routingRes?.data?.items, "Another API data");
+
     } catch (err) {
       console.error(err, "bbox error");
     }
@@ -55,93 +60,80 @@ export const handleSearchPlacesSelectedCountry = createAsyncThunk(
   }
 );
 
-// osrm
-export const handleDistanceForOsrmVanilla = createAsyncThunk(
+// osrm, graphHopper, valHalla
+export const handleRoutes = createAsyncThunk(
   "search/searchPlaces",
-
   async (data: any, { dispatch }) => {
-    const { selectLocationFrom, selectLocationTo } = data;
-    try {
-      const res = await axios.get(
-        `https://routing.openstreetmap.de/routed-car/route/v1/driving/${selectLocationFrom?.longitude},${selectLocationFrom?.latitude};${selectLocationTo?.longitude},${selectLocationTo?.latitude}?geometries=geojson&overview=full`
-      );
-      dispatch(setOsrmVanilla(res?.data));
-    } catch (err) {
-      console.error(err);
+    const { selectLocationFrom, selectLocationTo, routingApis, routeType } = data;
+    const reqBody = {
+      data: {
+        start: {
+          latitude: selectLocationFrom?.latitude,
+          longitude: selectLocationFrom?.longitude
+        },
+        destination: {
+          latitude: selectLocationTo?.latitude,
+          longitude: selectLocationTo?.longitude
+        }
+      }
+    };
+
+    
+    // Call the APIs
+    for (const routingApi of routingApis) {
+      if (routingApi.api_name === "osrm" && (routeType === "" || routeType === "osrm")) {
+        const apiUrl = routingApi.api_url
+        .replace('${selectLocationFrom?.longitude}', selectLocationFrom?.longitude)
+        .replace('${selectLocationFrom?.latitude}', selectLocationFrom?.latitude)
+        .replace('${selectLocationTo?.longitude}', selectLocationTo?.longitude)
+        .replace('${selectLocationTo?.latitude}', selectLocationTo?.latitude);
+        try {
+          const osrmRes = await axios.get(apiUrl);
+          dispatch(setOsrmVanilla(osrmRes?.data));
+        } catch (err: any) {
+          console.error(`OSRM API Error: ${err?.response?.data?.message}`);
+          messageError(`OSRM API Error: ${err?.response?.data?.message}`);
+          // Handle OSRM API error appropriately
+        }
+      } else if (routingApi.api_name === "gh" && (routeType === "" || routeType === "gh")) {
+        try {
+          const graphHopperRes = await axios.post(routingApi.api_url, {
+            reqBody
+          }, {
+            headers: {
+              'Accept': 'application/json, text/plain, */*',
+              'Content-Type': 'application/json'
+            }
+          });
+          // dispatch(setGraphHopper(graphHopperRes?.data));
+          console.log(graphHopperRes?.data, "graphHopperRes");
+        } catch (err: any) {
+          console.error(`GraphHopper API Error: ${err?.response?.data?.message}`);
+          messageError(`GraphHopper API Error: ${err?.response?.data?.message}`); 
+          // Handle GraphHopper API error appropriately
+        }
+      } else if (routingApi.api_name === "vh" && (routeType === "" || routeType === "vh")) {
+        try {
+          const valHallaRes = await axios.post(routingApi.api_url, {
+            reqBody
+          }, {
+            headers: {
+              'Accept': 'application/json, text/plain, */*',
+              'Content-Type': 'application/json'
+            }
+          });
+          // dispatch(setValhalla(valHallaRes?.data));
+          console.log(valHallaRes?.data, "valHallaRes");
+        } catch (err: any) {
+          console.error(`Valhalla API Error: ${err?.response?.data?.message}`);
+          messageError(`Valhalla API Error: ${err?.response?.data?.message}`);
+          // Handle Valhalla API error appropriately
+        }
+      } else if (routingApi.api_name === "google" && (routeType === "" || routeType === "google")) {
+        // Google Maps API call
+        const apiUrl = routingApi.api_url
+        dispatch(handleDistanceForGoogle({ selectLocationFrom, selectLocationTo , apiUrl}));
     }
-  }
-);
-
-// graphHopper
-export const handleDistanceForGH= createAsyncThunk(
-  "search/searchPlaces",
-  async (data: any, { dispatch }) => {
-    const { selectLocationFrom, selectLocationTo } = data;
-    try {
-      const reqBody = {
-        data: {
-          start: {
-            latitude: selectLocationFrom?.latitude,
-            longitude: selectLocationFrom?.longitude
-          },
-          destination: {
-            latitude: selectLocationTo?.latitude,
-            longitude: selectLocationTo?.longitude
-          }
-        }
-      };
-      const res = await axios.post(
-        `https://barikoi.xyz/v2/api/routing?key=bkoi_21ebd73425a38418c58e739f54b2ec5e43302bb67efe8c124d12bc8f1522f7fe&type=gh`,
-        JSON.stringify(reqBody),
-        {
-          headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      // dispatch(setOsrmVanilla(res?.data));
-      console.log(res);
-    } catch (err: any) {
-      console.error(err?.response?.data?.message);
-      messageError(`${err?.response?.data?.message} - graphHopper`);
-    }
-  }
-);
-
-// valHalla
-export const handleDistanceForValHalla = createAsyncThunk(
-  "search/searchPlaces",
-  async (data: any, { dispatch }) => {
-    const { selectLocationFrom, selectLocationTo } = data;
-    try {
-      const reqBody = {
-        data: {
-          start: {
-            latitude: selectLocationFrom?.latitude,
-            longitude: selectLocationFrom?.longitude
-          },
-          end: {
-            latitude: selectLocationTo?.latitude,
-            longitude: selectLocationTo?.longitude
-          }
-        }
-      };
-      const res = await axios.post(
-        `https://barikoi.xyz/v2/api/routing?key=bkoi_21ebd73425a38418c58e739f54b2ec5e43302bb67efe8c124d12bc8f1522f7fe&type=vh`,
-        JSON.stringify(reqBody),
-        {
-          headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      // dispatch(setOsrmVanilla(res?.data));
-      console.log(res);
-    } catch (err: any) {
-      console.error(err?.response?.data?.message);
-      messageError(`${err?.response?.data?.message} - valHalla`);
     }
   }
 );
@@ -150,9 +142,9 @@ export const handleDistanceForValHalla = createAsyncThunk(
 export const handleDistanceForGoogle = createAsyncThunk(
   "search/searchPlaces",
   async (data: any, { dispatch }) => {
-    const { selectLocationFrom, selectLocationTo } = data;
+    const { selectLocationFrom, selectLocationTo , apiUrl} = data;
     try {
-      const reqBody = {
+      const reqBodyGoogle = {
         origin: {
           location: {
             latLng: {
@@ -193,10 +185,10 @@ export const handleDistanceForGoogle = createAsyncThunk(
       myHeaders.append("Content-Type", "application/json");
 
       // Include the headers in the fetch request
-      const response = await fetch(`https://routes.googleapis.com/directions/v2:computeRoutes?key=AIzaSyCIDXPl45TgEji0BSyJOrnFzBKxTxZIMCU`, {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: myHeaders,
-        body: JSON.stringify(reqBody),
+        body: JSON.stringify(reqBodyGoogle),
       });
 
       // Process the response
