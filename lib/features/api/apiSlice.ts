@@ -4,7 +4,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 // import { message } from "antd";
 import { API } from "@/app.config";
 import { setBbox, setRoutingApis, setSearch } from "../map/mapSlice";
-import { setGoogleData, setOsrmKenya, setOsrmVanilla } from "../map/layerSlice";
+import { setAllRoutes, setGoogleData, setOsrmKenya, setOsrmVanilla } from "../map/layerSlice";
 import { messageError } from "@/components/AlertMessage";
 var polyline = require("@mapbox/polyline");
 
@@ -64,7 +64,9 @@ export const handleSearchPlacesSelectedCountry = createAsyncThunk(
 export const handleRoutes = createAsyncThunk(
   "search/searchPlaces",
   async (data: any, { dispatch }) => {
+    const routeInfo = [];
     const { selectLocationFrom, selectLocationTo, routingApis, routeType } = data;
+    // Build request body for gh vh type
     const reqBody = {
       data: {
         start: {
@@ -82,14 +84,34 @@ export const handleRoutes = createAsyncThunk(
     // Call the APIs
     for (const routingApi of routingApis) {
       if (routingApi.api_name === "osrm" && (routeType === "" || routeType === "osrm")) {
+        if(!(routeType === "")){
+          dispatch(setAllRoutes(null));
+        }
         const apiUrl = routingApi.api_url
         .replace('${selectLocationFrom?.longitude}', selectLocationFrom?.longitude)
         .replace('${selectLocationFrom?.latitude}', selectLocationFrom?.latitude)
         .replace('${selectLocationTo?.longitude}', selectLocationTo?.longitude)
         .replace('${selectLocationTo?.latitude}', selectLocationTo?.latitude);
         try {
-          const osrmRes = await axios.get(apiUrl);
-          dispatch(setOsrmVanilla(osrmRes?.data));
+          const osrmRes: any = await axios.get(apiUrl);
+          console.log(osrmRes?.data, "osrmRes");
+          const osrmVanilla = osrmRes?.data?.routes?.length > 0 ? osrmRes?.data?.routes[0]?.geometry : null;
+          console.log(osrmVanilla, 'osrmVanilla');
+        
+          if (osrmVanilla && osrmRes?.data?.routes[0]) {
+            const route = osrmRes.data.routes[0];
+            const osrmTypeData = {
+              // geometry: osrmVanilla,
+              coordinates: osrmVanilla?.coordinates,
+              type: osrmVanilla?.type,
+              distance: route.distance ? (route.distance / 1000).toFixed(2) : null,
+              duration: route.duration ? route.duration : null,
+              routeName: routingApi?.label,
+              lineColor: routingApi?.color_code?.color ? routingApi.color_code.color : '#32a66b',
+            }
+            console.log(osrmTypeData, "osrmTypeData");
+            routeInfo.push(osrmTypeData);
+          }
         } catch (err: any) {
           console.error(`OSRM API Error: ${err?.response?.data?.message}`);
           messageError(`OSRM API Error: ${err?.response?.data?.message}`);
@@ -130,11 +152,16 @@ export const handleRoutes = createAsyncThunk(
           // Handle Valhalla API error appropriately
         }
       } else if (routingApi.api_name === "google" && (routeType === "" || routeType === "google")) {
+        if(!(routeType === "")){
+          dispatch(setAllRoutes(null));
+        }
         // Google Maps API call
-        const apiUrl = routingApi.api_url
-        dispatch(handleDistanceForGoogle({ selectLocationFrom, selectLocationTo , apiUrl}));
+        // const apiUrl = routingApi.api_url
+        dispatch(handleDistanceForGoogle({ selectLocationFrom, selectLocationTo , routingApi}));
+        
     }
     }
+    dispatch(setAllRoutes(routeInfo));
   }
 );
 
@@ -142,7 +169,7 @@ export const handleRoutes = createAsyncThunk(
 export const handleDistanceForGoogle = createAsyncThunk(
   "search/searchPlaces",
   async (data: any, { dispatch }) => {
-    const { selectLocationFrom, selectLocationTo , apiUrl} = data;
+    const { selectLocationFrom, selectLocationTo , routingApi} = data;
     try {
       const reqBodyGoogle = {
         origin: {
@@ -185,7 +212,7 @@ export const handleDistanceForGoogle = createAsyncThunk(
       myHeaders.append("Content-Type", "application/json");
 
       // Include the headers in the fetch request
-      const response = await fetch(apiUrl, {
+      const response = await fetch(routingApi?.api_url, {
         method: "POST",
         headers: myHeaders,
         body: JSON.stringify(reqBodyGoogle),
@@ -199,6 +226,17 @@ export const handleDistanceForGoogle = createAsyncThunk(
           route.polyline.encodedPolyline
         );
         dispatch(setGoogleData({ ...route, decodedPolyline }));
+        if(decodedPolyline){
+          const googleObject = {
+            coordinates: decodedPolyline?.coordinates,
+            type: decodedPolyline?.type,
+            distance: route.distanceMeters ? (route.distanceMeters / 1000).toFixed(2) : null,
+            duration: route.duration ? Number(route.duration.replace('s', '')) : null,
+            routeName: routingApi?.label,
+            lineColor: routingApi?.color_code?.color ? routingApi.color_code.color : '#32a66b',
+          }
+          dispatch(setAllRoutes(googleObject));
+        }
         console.log({ ...route, decodedPolyline }, "decoded polyline");
       }
       return responseData;

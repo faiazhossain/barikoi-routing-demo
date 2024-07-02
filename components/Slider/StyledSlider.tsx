@@ -83,12 +83,6 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
     setIsDropdownEnabled(false);
   };
  
-  const routes = [
-    { value: "osrm", label: "OSRM" },
-    { value: "gh", label: "GraphHopper" },
-    { value: "vh", label: "Valhalla" },
-    { value: "google", label: "Google" },
-  ];
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/50">
       <aside

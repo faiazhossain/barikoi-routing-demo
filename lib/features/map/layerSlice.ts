@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 // Define a type for the slice state
 export interface LayerSlice {
+  allRoutes: any;
   osrmVanilla: Object;
   googleData: Object;
   osrmKenya: Object;
@@ -12,6 +13,7 @@ export interface LayerSlice {
 
 // Define the initial state using that type
 const initialState: LayerSlice = {
+  allRoutes: [],
   osrmVanilla: {},
   googleData: {},
   osrmKenya: {},
@@ -24,6 +26,17 @@ export const layerSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
+    setAllRoutes: (state, action) => {
+      if (action.payload === null) {
+        state.allRoutes = [];
+      } else if (Array.isArray(action.payload)) {
+        state.allRoutes = [...state.allRoutes, ...action.payload];
+      } else if (typeof action.payload === 'object') {
+        state.allRoutes.push(action.payload);
+      } else {
+        console.error('Unexpected payload type for setAllRoutes:', typeof action.payload);
+      }
+    },
     setOsrmVanilla: (state, action) => {
       state.osrmVanilla = action.payload;
     },
@@ -43,6 +56,7 @@ export const layerSlice = createSlice({
 });
 
 export const {
+  setAllRoutes,
   setOsrmVanilla,
   setOsrmKenya,
   setGoogleData,
