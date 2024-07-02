@@ -4,7 +4,7 @@ import {
   setSelectLocationTo,
 } from "@/lib/features/map/layerSlice";
 import { setSelectAutocompleteData } from "@/lib/features/map/leftPanelSlice";
-import { setPreviouslySelectedValue } from "@/lib/features/map/mapSlice";
+import { setPreviouslySelectedValue, setSelectedMarker } from "@/lib/features/map/mapSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hook";
 import React from "react";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
@@ -58,6 +58,13 @@ function RoutingAutocomplete({ uniqueId, bbox }: { uniqueId: any; bbox: any }) {
       );
     uniqueId === "end" &&
       dispatch(setSelectLocationTo({ ...dataFromGeoCode, pointType: "To" }));
+
+      dispatch(
+        setSelectedMarker({
+          longitude: item?.lng,
+          latitude: item?.lat,
+        })
+      );
   };
 
   const handleOnFocus = () => {

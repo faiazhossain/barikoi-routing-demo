@@ -83,7 +83,7 @@ export const handleRoutes = createAsyncThunk(
     
     // Call the APIs
     for (const routingApi of routingApis) {
-      if (routingApi.api_name === "osrm" && (routeType === "" || routeType === "osrm")) {
+      if (routingApi.api_format === "type_osrm" && (routeType === "" || routeType === routingApi.api_format)) {
         if(!(routeType === "")){
           dispatch(setAllRoutes(null));
         }
@@ -117,7 +117,7 @@ export const handleRoutes = createAsyncThunk(
           messageError(`OSRM API Error: ${err?.response?.data?.message}`);
           // Handle OSRM API error appropriately
         }
-      } else if (routingApi.api_name === "gh" && (routeType === "" || routeType === "gh")) {
+      } else if (routingApi.api_format === "type_gh" && (routeType === "" || routeType === routingApi.api_format)) {
         try {
           const graphHopperRes = await axios.post(routingApi.api_url, {
             reqBody
@@ -134,7 +134,7 @@ export const handleRoutes = createAsyncThunk(
           messageError(`GraphHopper API Error: ${err?.response?.data?.message}`); 
           // Handle GraphHopper API error appropriately
         }
-      } else if (routingApi.api_name === "vh" && (routeType === "" || routeType === "vh")) {
+      } else if (routingApi.api_format === "type_vh" && (routeType === "" || routeType === routingApi.api_format)) {
         try {
           const valHallaRes = await axios.post(routingApi.api_url, {
             reqBody
@@ -151,7 +151,7 @@ export const handleRoutes = createAsyncThunk(
           messageError(`Valhalla API Error: ${err?.response?.data?.message}`);
           // Handle Valhalla API error appropriately
         }
-      } else if (routingApi.api_name === "google" && (routeType === "" || routeType === "google")) {
+      } else if (routingApi.api_format === "type_google" && (routeType === "" || routeType === routingApi.api_format)) {
         if(!(routeType === "")){
           dispatch(setAllRoutes(null));
         }

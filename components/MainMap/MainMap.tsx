@@ -54,8 +54,8 @@ const MainMap = () => {
   // fly to selected marker
   useEffect(() => {
     if (selectedMarker?.latitude && selectedMarker?.longitude) {
-      console.log(selectedMarker);
-      mapRef.current?.flyTo({ center: [selectedMarker.longitude, selectedMarker.latitude], zoom: 15 });
+      // console.log(selectedMarker, "selectedMarkerssssssssssss");
+      mapRef.current?.flyTo({ center: [selectedMarker.longitude, selectedMarker.latitude], zoom: 11, speed: 0.8, curve: 1, essential: true });
     }
   }, [selectedMarker]);
 

@@ -7,14 +7,19 @@ import {
   handleRoutes,
 } from "@/lib/features/api/apiSlice";
 import {
+  setAllRoutes,
   setGoogleData,
   setOsrmVanilla,
   setSelectLocationFrom,
   setSelectLocationTo,
 } from "@/lib/features/map/layerSlice";
+import { setSelectedMarker } from "@/lib/features/map/mapSlice";
 
 function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
   const dispatch = useAppDispatch();
+  const allRoutes: any = useAppSelector(
+    (state) => state?.layerSlice?.allRoutes ?? []
+  )
   const selectLocationFrom: any = useAppSelector(
     (state: any) => state?.layerSlice?.selectLocationFrom
   );
@@ -25,7 +30,7 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
     (state) => state?.layerSlice?.osrmVanilla ?? null
   ) as { routes: any[] };
   const googleData = useAppSelector(
-    (state) => state?.layerSlice?.googleData ?? null 
+    (state) => state?.layerSlice?.googleData ?? null
   ) as { duration: any, distanceMeters: number };
   const routingApis = useAppSelector(
     (state) => state?.mainmap?.routingApis
@@ -45,33 +50,8 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
   }, [selectLocationFrom, selectLocationTo, routeType]);
 
   const handleRouteTypeChange = (e: any) => {
+    dispatch(setAllRoutes(null));
     setRouteType(e.target.value);
-    if (e.target.value === "gh") {
-      // dispatch(handleDistanceForGH({ selectLocationFrom, selectLocationTo }));
-      dispatch(setGoogleData({}));
-      dispatch(setOsrmVanilla({}));
-    } else if (e.target.value === "vh") {
-      // dispatch(
-      //   handleDistanceForValHalla({ selectLocationFrom, selectLocationTo })
-      // );
-      dispatch(setGoogleData({}));
-      dispatch(setOsrmVanilla({}));
-    // } else if (e.target.value === "google") {
-    //   dispatch(
-    //     handleDistanceForGoogle({ selectLocationFrom, selectLocationTo })
-    //   );
-      // dispatch(setGoogleData({}));
-      dispatch(setOsrmVanilla({}));
-    }else if (e.target.value === "osrm") {
-      // dispatch(
-      //   handleDistanceForOsrmVanilla({ selectLocationFrom, selectLocationTo })
-      // );
-      dispatch(setGoogleData({}));
-      // dispatch(setOsrmVanilla({}));
-    }else if (e.target.value === "google") {
-      dispatch(setOsrmVanilla({}));
-      // dispatch(setGoogleData({}));
-    }
   };
 
   const handleCloseClick = () => {
@@ -80,9 +60,11 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
     dispatch(setSelectLocationTo({}));
     dispatch(setOsrmVanilla({}));
     dispatch(setGoogleData({}));
+    dispatch(setAllRoutes(null));
+    dispatch(setSelectedMarker({}));
     setIsDropdownEnabled(false);
   };
- 
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/50">
       <aside
@@ -139,25 +121,24 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
             >
               <option value="">All</option>
               {routingApis.map((route: any) => (
-                <option key={route?.id} value={route?.api_name}>
+                <option key={route?.id} value={route?.api_format}>
                   {route?.label}
                 </option>
               ))}
             </select>
           </div>
         </nav>
-        {osrmVanilla?.routes && (
-            <div style={{ position: "relative" }}>
+        <div style={{ height: "500px", overflowY: "auto" }}>
+          {allRoutes.map((route: any, index: any) => (
+            <div key={index} style={{ position: "relative", marginBottom: "20px" }}>
               <div style={{ fontSize: "16px" }}>
-                <b>OSRM - Vanilla</b>
+                <b>{route.routeName} Route</b>
               </div>
               <div style={{ ...distanceTimeDivStyle }}>
-                {/* <GiPathDistance style={{ ...iconStyleFromTo }} /> */}
                 <div style={{ fontSize: "16px" }}>
-                  <b>Distance:</b> {osrmVanilla?.routes[0]?.distance ? (osrmVanilla.routes[0].distance / 1000).toFixed(2) : null} km{" "}
+                  <b>Distance:</b> {route.distance} km
                 </div>
               </div>
-
               <div
                 style={{
                   display: "flex",
@@ -166,21 +147,22 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
                   marginTop: "5px",
                 }}
               >
-                {/* <BiTime style={{ ...iconStyleFromTo }} /> */}
                 <div style={{ fontSize: "16px" }}>
-                  {/* Convert to hours and minutes */}
-                  {osrmVanilla?.routes[0]?.duration ? (
-                    <div>
-                      <b>Time:</b>{" "}
-                      {Math.floor(osrmVanilla.routes[0].duration / 3600) +
-                        " hr " +
-                        Math.floor(
-                          (osrmVanilla.routes[0].duration % 3600) / 60
-                        ) +
-                        " min"}
-                    </div>
-                  ) : null}
-                  {/* <b>{hours} hour{hours !== 1 ? 's' : ''} {minutes} minute {minutes !== 1 ? 's' : ''}</b> */}
+                  <b>Time:</b> {
+                    (() => {
+                      const durationInSeconds = typeof route.duration === 'number'
+                        ? route.duration
+                        : typeof route.duration === 'string'
+                          ? parseInt(route.duration.replace('s', ''), 10)
+                          : 0;
+                      const hours = Math.floor(durationInSeconds / 3600);
+                      const minutes = Math.floor((durationInSeconds % 3600) / 60);
+                      let timeString = '';
+                      if (hours > 0) timeString += `${hours} hr `;
+                      if (minutes > 0 || hours === 0) timeString += `${minutes} min`;
+                      return timeString;
+                    })()
+                  }
                 </div>
               </div>
               <div
@@ -189,74 +171,14 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
                   top: "0",
                   right: "0",
                   position: "absolute",
-                  background: "rgba(55, 103, 210,.8)",
+                  background: `rgb(${route.lineColor})`,
                 }}
               >
                 Route Color
               </div>
             </div>
-          )}
-          {/* For google */}
-          {/* {distance && <Divider></Divider>} */}
-          <br/> 
-          {googleData?.duration && (
-            <div style={{ position: "relative" }}>
-              <div style={{ fontSize: "16px" }}>
-                <b>Google Route</b>
-              </div>
-              <div style={{ ...distanceTimeDivStyle }}>
-                {/* <GiPathDistance style={{ ...iconStyleFromTo }} /> */}
-                <div style={{ fontSize: "16px" }}>
-                  <b>Distance:</b> {(googleData?.distanceMeters ?? 0) / 1000} km{" "}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "20px",
-                  marginTop: "5px",
-                }}
-              >
-                {/* <BiTime style={{ ...iconStyleFromTo }} /> */}
-                <div style={{ fontSize: "16px" }}>
-  <b>Time:</b> {
-    (() => {
-      // Check if duration is a number (in seconds) or a string like "63s"
-      const durationInSeconds = typeof googleData?.duration === 'number' 
-        ? googleData.duration 
-        : typeof googleData?.duration === 'string' 
-          ? parseInt(googleData.duration.replace('s', ''), 10) 
-          : 0;
-
-      // Calculate hours and minutes
-      const hours = Math.floor(durationInSeconds / 3600);
-      const minutes = Math.floor((durationInSeconds % 3600) / 60);
-
-      // Format the string to display
-      let timeString = '';
-      if (hours > 0) timeString += `${hours} hour${hours !== 1 ? 's' : ''} `;
-      if (minutes > 0 || hours === 0) timeString += `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-
-      return timeString;
-    })()
-  }
-</div>
-              </div>
-              <div
-                style={{
-                  padding: "10px",
-                  top: "0",
-                  right: "0",
-                  position: "absolute",
-                  background: "rgba(255, 0, 0, 0.8)",
-                }}
-              >
-                Route Color
-              </div>
-            </div>
-          )}
+          ))}
+        </div>
       </aside>
     </div>
   );
