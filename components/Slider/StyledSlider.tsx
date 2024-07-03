@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { XCircle } from "lucide-react";
+import { ArrowUpDown, XCircle } from "lucide-react";
 import RoutingAutocomplete from "../Autocomplete/RoutingAutocomplete";
 import { useAppDispatch, useAppSelector } from "@/lib/hook";
 import {
@@ -26,12 +26,6 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
   const selectLocationTo: any = useAppSelector(
     (state: any) => state?.layerSlice?.selectLocationTo
   );
-  const osrmVanilla = useAppSelector(
-    (state) => state?.layerSlice?.osrmVanilla ?? null
-  ) as { routes: any[] };
-  const googleData = useAppSelector(
-    (state) => state?.layerSlice?.googleData ?? null
-  ) as { duration: any, distanceMeters: number };
   const routingApis = useAppSelector(
     (state) => state?.mainmap?.routingApis
   )
@@ -65,6 +59,12 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
     setIsDropdownEnabled(false);
   };
 
+  const swapValues = () => {
+    dispatch(setAllRoutes(null));
+    const tempLocation = selectLocationFrom;
+    dispatch(setSelectLocationFrom(selectLocationTo));
+    dispatch(setSelectLocationTo(tempLocation));
+  };
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/50">
       <aside
@@ -87,24 +87,28 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
             </>
           </div>
 
-          <div className="my-3">
-            <label
-              htmlFor="dropdown-example"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Start
-            </label>
-            <RoutingAutocomplete uniqueId={"start"} bbox={bbox} />
-          </div>
-          <div className="my-3">
-            <label
-              htmlFor="dropdown-example"
-              className="block text-sm font-medium text-gray-700"
-            >
-              End
-            </label>
-            <RoutingAutocomplete uniqueId={"end"} bbox={bbox} />
-          </div>
+          <div>
+      <div className="my-2">
+        <label htmlFor="start" className="block text-sm font-medium text-gray-700">
+          Start
+        </label>
+        <RoutingAutocomplete uniqueId={"start"} bbox={bbox}  />
+      </div>
+      {selectLocationFrom?.latitude && selectLocationTo?.latitude && <button
+        type="button"
+        className="flex rounded-full bg-white p-1 text-gray-400 hover:bg-gray-200 active:bg-gray-300 focus:outline-none mx-auto"
+        onClick={swapValues}
+      >
+        <ArrowUpDown className="mx-auto h-4 w-4" />
+      </button>}
+      <div className="my-2">
+        <label htmlFor="end" className="block text-sm font-medium text-gray-700">
+          End
+        </label>
+        <RoutingAutocomplete uniqueId={"end"} bbox={bbox} />
+      </div>
+    </div>
+
           <div className="my-3">
             <label
               htmlFor="dropdown-example"
@@ -128,7 +132,7 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
             </select>
           </div>
         </nav>
-        <div style={{ height: "500px", overflowY: "auto" }}>
+        <div style={{ height: "470px", overflowY: "auto" }}>
           {allRoutes.map((route: any, index: any) => (
             <div key={index} style={{ position: "relative", marginBottom: "20px" }}>
               <div style={{ fontSize: "16px" }}>

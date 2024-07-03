@@ -118,27 +118,46 @@ export const handleRoutes = createAsyncThunk(
           // Handle OSRM API error appropriately
         }
       } else if (routingApi.api_format === "type_gh" && (routeType === "" || routeType === routingApi.api_format)) {
+        if(!(routeType === "")){
+          dispatch(setAllRoutes(null));
+        }
         try {
-          const graphHopperRes = await axios.post(routingApi.api_url, {
+          const graphHopperRes = await axios.post(routingApi.api_url, 
             reqBody
-          }, {
+          , {
             headers: {
               'Accept': 'application/json, text/plain, */*',
               'Content-Type': 'application/json'
             }
           });
           // dispatch(setGraphHopper(graphHopperRes?.data));
-          console.log(graphHopperRes?.data, "graphHopperRes");
+          console.log(graphHopperRes?.data?.paths[0], "graphHopperRes");
+          if(graphHopperRes?.data?.paths?.length > 0 && graphHopperRes?.data?.paths[0]) {
+            const ghTypeData = {
+              // geometry: graphHopperRes?.data?.paths[0]?.points,
+              type: graphHopperRes?.data?.paths[0]?.points?.type,
+              coordinates: graphHopperRes?.data?.paths[0]?.points?.coordinates,
+              distance: graphHopperRes?.data?.paths[0]?.distance ? (graphHopperRes?.data?.paths[0]?.distance / 1000).toFixed(2) : null,
+              duration: graphHopperRes?.data?.paths[0]?.time ? (graphHopperRes?.data?.paths[0]?.time / 1000) : null,
+              routeName: routingApi?.label,
+              lineColor: routingApi?.color_code?.color ? routingApi.color_code.color : '#32a66b',
+            }
+            console.log(ghTypeData, "ghTypeData");
+            routeInfo.push(ghTypeData);
+          }
         } catch (err: any) {
           console.error(`GraphHopper API Error: ${err?.response?.data?.message}`);
           messageError(`GraphHopper API Error: ${err?.response?.data?.message}`); 
           // Handle GraphHopper API error appropriately
         }
       } else if (routingApi.api_format === "type_vh" && (routeType === "" || routeType === routingApi.api_format)) {
+        if(!(routeType === "")){
+          dispatch(setAllRoutes(null));
+        }
         try {
-          const valHallaRes = await axios.post(routingApi.api_url, {
+          const valHallaRes = await axios.post(routingApi.api_url,
             reqBody
-          }, {
+          , {
             headers: {
               'Accept': 'application/json, text/plain, */*',
               'Content-Type': 'application/json'
