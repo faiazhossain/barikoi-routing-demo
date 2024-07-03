@@ -10,6 +10,7 @@ import StyledSlider from "../Slider/StyledSlider";
 import RouteLayer from "../Layers/RouteLayer";
 import Markers from "../Markers/Markers";
 import { handleBbox } from "@/lib/features/api/apiSlice";
+import RightClickPopup from "../common/popup/RightClickPopup";
 
 
 const MainMap = () => {
@@ -32,7 +33,8 @@ const MainMap = () => {
     (state: any) => state?.layerSlice?.selectLocationTo
   );
   const [routingPage, setRoutingPage] = React.useState(false);
-
+  const [showPopupRightClick, setShowPopupRightClick] = React.useState(false);
+  const [rightClickLatLng, setRightClickLatLng] = React.useState({});
   // get bbox for selected country
   useEffect(() => {
     dispatch(handleBbox({}));
@@ -51,6 +53,13 @@ const MainMap = () => {
     }
   }, [selectLocationFrom, selectLocationTo]);
 
+  // show popup on right click
+  const handleRightClick = (e) => {
+    setShowPopupRightClick(true);
+    // dispatch(setLngLatFromRightClick(e?.lngLat));
+    setRightClickLatLng(e?.lngLat);
+
+  };
   // fly to selected marker
   useEffect(() => {
     if (selectedMarker?.latitude && selectedMarker?.longitude) {
@@ -85,12 +94,13 @@ const MainMap = () => {
     <Map
       ref={mapRef}
       initialViewState={{
-        latitude: 23.76663,
-        longitude: 90.37839,
-        zoom: 11,
+        latitude: bbox?.maxLat ?? 26.145652,
+        longitude: bbox?.maxLon ?? 88.183961,
+        zoom: 5,
       }}
       style={{ width: "100vw", height: "100vh" }}
       mapStyle="https://tiles.barikoimaps.dev/styles/barkoi_green/style.json"
+      onContextMenu={handleRightClick}
     >
       {routingPage ? (
         <StyledSlider bbox={bbox} setRouting={setRoutingPage} />
@@ -100,7 +110,16 @@ const MainMap = () => {
       <FitToCountry />
       <Markers />
       {leftPanelData?.id && <LocationDetails location={leftPanelData} />}
+      {/* map layers  */}
       <RouteLayer />
+
+      {/* popup on right click */}
+      <RightClickPopup 
+      showPopup={showPopupRightClick} 
+      rightClickLatLng={rightClickLatLng}
+      onClose={() => setShowPopupRightClick(false)}
+      setRouting={setRoutingPage}
+      />
     </Map>
   );
 };

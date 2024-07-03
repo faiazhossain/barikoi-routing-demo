@@ -1,5 +1,6 @@
 import { handleSearchPlacesSelectedCountry } from "@/lib/features/api/apiSlice";
 import {
+  setAllRoutes,
   setSelectLocationFrom,
   setSelectLocationTo,
 } from "@/lib/features/map/layerSlice";
@@ -12,6 +13,12 @@ import { ReactSearchAutocomplete } from "react-search-autocomplete";
 // import { set } from "lodash";
 function RoutingAutocomplete({ uniqueId, bbox }: { uniqueId: any; bbox: any }) {
   const dispatch = useAppDispatch();
+  const selectLocationFrom: any = useAppSelector(
+    (state: any) => state?.layerSlice?.selectLocationFrom
+  )
+  const selectLocationTo: any = useAppSelector(
+    (state: any) => state?.layerSlice?.selectLocationTo
+  )
   type Item = {
     id: number;
     name: string;
@@ -43,7 +50,8 @@ function RoutingAutocomplete({ uniqueId, bbox }: { uniqueId: any; bbox: any }) {
   };
   const searchData: any = useAppSelector((state) => state?.mainmap?.search);
   const handleOnSelect = (item: Item) => {
-    // console.log(item, uniqueId);
+    dispatch(setAllRoutes(null));
+    console.log(item, "uniqueId itemmmmm");
     const lat = item.lat;
     const lng = item.lng;
     const data = { lat, lng };
@@ -51,6 +59,7 @@ function RoutingAutocomplete({ uniqueId, bbox }: { uniqueId: any; bbox: any }) {
       latitude: data?.lat,
       longitude: data?.lng,
       value: `${data?.lat},${data?.lng}`,
+      name: item?.name,
     };
     uniqueId === "start" &&
       dispatch(
@@ -103,7 +112,8 @@ function RoutingAutocomplete({ uniqueId, bbox }: { uniqueId: any; bbox: any }) {
           showNoResults={false}
           formatResult={formatResult}
           placeholder="Search for a place"
-          className={uniqueId === "start" ? "z-20" : "z-0"}
+          className={uniqueId === "start" ? "z-20" : "z-10"}
+          inputSearchString={uniqueId === "start" ? selectLocationFrom?.latitude?selectLocationFrom?.name:'' : selectLocationTo?.latitude? selectLocationTo?.name:''}
         />
       </div>
     </div>

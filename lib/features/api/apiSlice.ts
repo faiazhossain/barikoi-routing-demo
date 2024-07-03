@@ -164,6 +164,23 @@ export const handleRoutes = createAsyncThunk(
             }
           });
           // dispatch(setValhalla(valHallaRes?.data));
+          if(valHallaRes?.data?.trip?.legs.length > 0 && valHallaRes?.data?.trip?.legs[0]) {
+            const decodedPolyline = polyline.toGeoJSON(
+              valHallaRes?.data?.trip?.legs[0]?.shape,6
+            );
+            // console.log(decodedPolyline, "VValshalladecodedPolyline");
+            const vhTypeData = {
+              coordinates: decodedPolyline?.coordinates,
+              type: decodedPolyline?.type,
+              //miles to km
+              distance: valHallaRes?.data?.trip?.summary?.length ? (valHallaRes?.data?.trip?.summary?.length * 1.60934).toFixed(2) : null,
+              duration: valHallaRes?.data?.trip?.summary?.time ? (valHallaRes?.data?.trip?.summary?.time) : null,
+              routeName: routingApi?.label,
+              lineColor: routingApi?.color_code?.color ? routingApi.color_code.color : '#32a66b',
+            }
+            // console.log(vhTypeData, "vhTypeData");
+            routeInfo.push(vhTypeData);
+          }
           console.log(valHallaRes?.data, "valHallaRes");
         } catch (err: any) {
           console.error(`Valhalla API Error: ${err?.response?.data?.message}`);
