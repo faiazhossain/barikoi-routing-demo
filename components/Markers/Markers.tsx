@@ -2,7 +2,7 @@
 import React from "react";
 import { Marker } from "react-map-gl/maplibre";
 import { useAppDispatch, useAppSelector } from "@/lib/hook";
-import { setSelectLocationFrom, setSelectLocationTo } from "@/lib/features/map/layerSlice";
+import { setAllRoutes, setSelectLocationFrom, setSelectLocationTo } from "@/lib/features/map/layerSlice";
 
 const Markers = () => {
   const dispatch = useAppDispatch();
@@ -20,7 +20,7 @@ const Markers = () => {
     (state: any) => state?.layerSlice?.selectLocationTo
   );
  const handleDragEnd = (e, type) => {
-  console.log("🚀 ~ e:", e?.lngLat?.lat, e?.lngLat?.lng);
+  dispatch(setAllRoutes(null));
   if(type="from"){
     dispatch(setSelectLocationFrom({
       latitude: e?.lngLat?.lat,
