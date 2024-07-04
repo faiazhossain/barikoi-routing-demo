@@ -4,7 +4,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 // import { message } from "antd";
 import { API } from "@/app.config";
 import { setBbox, setRoutingApis, setSearch } from "../map/mapSlice";
-import { setAllRoutes, setGoogleData, setOsrmKenya, setOsrmVanilla } from "../map/layerSlice";
+import { setAllRoutes, setGoogleData, setOsrmKenya } from "../map/layerSlice";
 import { messageError } from "@/components/AlertMessage";
 var polyline = require("@mapbox/polyline");
 
@@ -66,6 +66,13 @@ export const handleRoutes = createAsyncThunk(
   async (data: any, { dispatch }) => {
     const routeInfo = [];
     const { selectLocationFrom, selectLocationTo, routingApis, routeType } = data;
+    console.log(data, "data");
+    if(routeType === "none"){
+      return;
+    }
+    if(!(routeType === "all")){
+      dispatch(setAllRoutes(null));
+    }
     // Build request body for gh vh type
     const reqBody = {
       data: {
@@ -78,15 +85,11 @@ export const handleRoutes = createAsyncThunk(
           longitude: selectLocationTo?.longitude
         }
       }
-    };
-
-    
+    };    
     // Call the APIs
     for (const routingApi of routingApis) {
-      if (routingApi.api_format === "type_osrm" && (routeType === "" || routeType === routingApi.api_format)) {
-        if(!(routeType === "")){
-          dispatch(setAllRoutes(null));
-        }
+      if (routingApi.api_format === "type_osrm" && (routeType === "all" || routeType === routingApi.api_format)) {
+
         const apiUrl = routingApi.api_url
         .replace('${selectLocationFrom?.longitude}', selectLocationFrom?.longitude)
         .replace('${selectLocationFrom?.latitude}', selectLocationFrom?.latitude)
@@ -117,10 +120,8 @@ export const handleRoutes = createAsyncThunk(
           messageError(`OSRM API Error: ${err?.response?.data?.message}`);
           // Handle OSRM API error appropriately
         }
-      } else if (routingApi.api_format === "type_gh" && (routeType === "" || routeType === routingApi.api_format)) {
-        if(!(routeType === "")){
-          dispatch(setAllRoutes(null));
-        }
+      } else if (routingApi.api_format === "type_gh" && (routeType === "all" || routeType === routingApi.api_format)) {
+
         try {
           const graphHopperRes = await axios.post(routingApi.api_url, 
             reqBody
@@ -142,7 +143,7 @@ export const handleRoutes = createAsyncThunk(
               routeName: routingApi?.label,
               lineColor: routingApi?.color_code?.color ? routingApi.color_code.color : '#32a66b',
             }
-            console.log(ghTypeData, "ghTypeData");
+            // console.log(ghTypeData, "ghTypeData");
             routeInfo.push(ghTypeData);
           }
         } catch (err: any) {
@@ -150,10 +151,8 @@ export const handleRoutes = createAsyncThunk(
           messageError(`GraphHopper API Error: ${err?.response?.data?.message}`); 
           // Handle GraphHopper API error appropriately
         }
-      } else if (routingApi.api_format === "type_vh" && (routeType === "" || routeType === routingApi.api_format)) {
-        if(!(routeType === "")){
-          dispatch(setAllRoutes(null));
-        }
+      } else if (routingApi.api_format === "type_vh" && (routeType === "all" || routeType === routingApi.api_format)) {
+
         try {
           const valHallaRes = await axios.post(routingApi.api_url,
             reqBody
@@ -181,16 +180,13 @@ export const handleRoutes = createAsyncThunk(
             // console.log(vhTypeData, "vhTypeData");
             routeInfo.push(vhTypeData);
           }
-          console.log(valHallaRes?.data, "valHallaRes");
+          // console.log(valHallaRes?.data, "valHallaRes");
         } catch (err: any) {
           console.error(`Valhalla API Error: ${err?.response?.data?.message}`);
           messageError(`Valhalla API Error: ${err?.response?.data?.message}`);
           // Handle Valhalla API error appropriately
         }
-      } else if (routingApi.api_format === "type_google" && (routeType === "" || routeType === routingApi.api_format)) {
-        if(!(routeType === "")){
-          dispatch(setAllRoutes(null));
-        }
+      } else if (routingApi.api_format === "type_google" && (routeType === "all" || routeType === routingApi.api_format)) {
         // Google Maps API call
         // const apiUrl = routingApi.api_url
         dispatch(handleDistanceForGoogle({ selectLocationFrom, selectLocationTo , routingApi}));

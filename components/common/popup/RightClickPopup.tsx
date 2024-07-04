@@ -31,7 +31,7 @@ const dispatch = useAppDispatch();
       latitude: rightClickLatLng?.lat, 
       longitude: rightClickLatLng?.lng,
       value: `${rightClickLatLng?.lat},${rightClickLatLng?.lng}`,
-      name: `${rightClickLatLng?.lat},${rightClickLatLng?.lng}`,
+      name: `${rightClickLatLng?.lat.toFixed(4)},${rightClickLatLng?.lng.toFixed(4)}`,
       pointType: "To", 
     }));
     setRouting(true);

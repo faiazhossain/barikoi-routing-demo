@@ -9,6 +9,7 @@ import {
 } from "@/lib/features/map/mapSlice";
 import { handleSearchPlacesSelectedCountry } from "@/lib/features/api/apiSlice";
 import { setSelectAutocompleteData } from "@/lib/features/map/leftPanelSlice";
+import { Console } from "console";
 
 function Autocomplete({ bbox, setRouting }: any) {
   type Item = {
@@ -26,7 +27,7 @@ function Autocomplete({ bbox, setRouting }: any) {
   const [items, setItems] = useState<Item[]>([]);
 
   const handleOnSearch = (string: string) => {
-    if (string !== previouslySelectedValue) {
+    if (string !== previouslySelectedValue && bbox?.minLon) {
       dispatch(
         handleSearchPlacesSelectedCountry({
           value: string,

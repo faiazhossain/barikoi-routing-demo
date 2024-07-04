@@ -14,6 +14,7 @@ import {
   setSelectLocationTo,
 } from "@/lib/features/map/layerSlice";
 import { setSelectedMarker } from "@/lib/features/map/mapSlice";
+import { setRouteType } from "@/lib/features/map/leftPanelSlice";
 
 function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
   const dispatch = useAppDispatch();
@@ -29,23 +30,28 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
   const routingApis = useAppSelector(
     (state) => state?.mainmap?.routingApis
   )
-  const [routeType, setRouteType] = useState("");
+  const routeType = useAppSelector(
+    (state) => state?.leftPanel?.routeType
+  )
+  // const [routeType, setRouteType] = useState("none");
   const [isDropdownEnabled, setIsDropdownEnabled] = useState(false);
 
   useEffect(() => {
-    if (selectLocationFrom && selectLocationTo) {
+    if (selectLocationFrom?.latitude && selectLocationTo?.latitude) {
       setIsDropdownEnabled(true);
     } else {
       setIsDropdownEnabled(false);
     }
     if (selectLocationFrom?.latitude && selectLocationTo?.latitude) {
       dispatch(handleRoutes({ selectLocationFrom, selectLocationTo, routingApis, routeType }));
+    }else{
+      dispatch(setAllRoutes(null));
     }
   }, [selectLocationFrom, selectLocationTo, routeType]);
 
   const handleRouteTypeChange = (e: any) => {
     dispatch(setAllRoutes(null));
-    setRouteType(e.target.value);
+    dispatch(setRouteType(e.target.value))
   };
 
   const handleCloseClick = () => {
@@ -57,6 +63,7 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
     dispatch(setAllRoutes(null));
     dispatch(setSelectedMarker({}));
     setIsDropdownEnabled(false);
+    dispatch(setRouteType(null));
   };
 
   const swapValues = () => {
@@ -123,7 +130,8 @@ function StyledSlider({ setRouting, bbox }: { setRouting: any; bbox: any }) {
               onChange={handleRouteTypeChange}
               disabled={!isDropdownEnabled}
             >
-              <option value="">All</option>
+              <option value="none" disabled selected>Select Route</option>
+              <option value="all">All</option>
               {routingApis.map((route: any) => (
                 <option key={route?.id} value={route?.api_format}>
                   {route?.label}

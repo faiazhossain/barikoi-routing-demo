@@ -4,7 +4,7 @@ import {
   setSelectLocationFrom,
   setSelectLocationTo,
 } from "@/lib/features/map/layerSlice";
-import { setSelectAutocompleteData } from "@/lib/features/map/leftPanelSlice";
+import { setRouteType, setSelectAutocompleteData } from "@/lib/features/map/leftPanelSlice";
 import { setPreviouslySelectedValue, setSelectedMarker } from "@/lib/features/map/mapSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hook";
 import React from "react";
@@ -51,7 +51,8 @@ function RoutingAutocomplete({ uniqueId, bbox }: { uniqueId: any; bbox: any }) {
   const searchData: any = useAppSelector((state) => state?.mainmap?.search);
   const handleOnSelect = (item: Item) => {
     dispatch(setAllRoutes(null));
-    console.log(item, "uniqueId itemmmmm");
+    dispatch(setRouteType(null));
+    // console.log(item, "uniqueId itemmmmm");
     const lat = item.lat;
     const lng = item.lng;
     const data = { lat, lng };
@@ -67,17 +68,17 @@ function RoutingAutocomplete({ uniqueId, bbox }: { uniqueId: any; bbox: any }) {
       );
     uniqueId === "end" &&
       dispatch(setSelectLocationTo({ ...dataFromGeoCode, pointType: "To" }));
-
-      dispatch(
-        setSelectedMarker({
-          longitude: item?.lng,
-          latitude: item?.lat,
-        })
-      );
   };
 
   const handleOnFocus = () => {
     // console.log("Focused");
+  };
+  const handleOnclear = () => {
+    dispatch(setSelectAutocompleteData({}));
+    dispatch(setAllRoutes(null));
+    dispatch(setRouteType(null));
+    uniqueId === "start" && dispatch(setSelectLocationFrom({}));
+    uniqueId === "end" && dispatch(setSelectLocationTo({}));
   };
 
   const formatResult = (item: Item) => {
@@ -108,6 +109,7 @@ function RoutingAutocomplete({ uniqueId, bbox }: { uniqueId: any; bbox: any }) {
           onSelect={handleOnSelect}
           onFocus={handleOnFocus}
           autoFocus
+          onClear={handleOnclear}
           inputDebounce={250}
           showNoResults={false}
           formatResult={formatResult}
