@@ -18,7 +18,6 @@ export function OlaMap() {
       }}
       style={{ width: "100vw", height: "100vh" }}
       mapStyle="https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json"
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:1229590010.
       transformRequest={ transformReq }
     />
   );
