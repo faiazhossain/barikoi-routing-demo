@@ -48,7 +48,7 @@ const MainMap = () => {
           [selectLocationFrom.longitude, selectLocationFrom.latitude],
           [selectLocationTo.longitude, selectLocationTo.latitude],
         ],
-        { padding: 40, duration: 1000 }
+        { padding: { top: 40, right: 40, bottom: 40, left: 380 }, duration: 1000 }
       );
     }
   }, [selectLocationFrom, selectLocationTo]);
