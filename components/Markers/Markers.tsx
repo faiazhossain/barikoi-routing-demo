@@ -15,7 +15,7 @@ const Markers = () => {
   const selectLocationFrom: any = useAppSelector(
     (state: any) => state?.layerSlice?.selectLocationFrom
   );
-  console.log("🚀 ~ Markers ~ selectLocationFrom:", selectLocationFrom);
+  // console.log("🚀 ~ Markers ~ selectLocationFrom:", selectLocationFrom);
   const selectLocationTo: any = useAppSelector(
     (state: any) => state?.layerSlice?.selectLocationTo
   );
