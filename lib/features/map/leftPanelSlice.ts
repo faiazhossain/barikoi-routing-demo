@@ -4,11 +4,13 @@ import { createSlice } from "@reduxjs/toolkit";
 // Define a type for the slice state
 export interface LeftPanelSlice {
   selectAutocompleteData: object;
+  routeType: string;
 }
 
 // Define the initial state using that type
 const initialState: LeftPanelSlice = {
   selectAutocompleteData: {},
+  routeType: "none",
 };
 
 export const leftPanelSlice = createSlice({
@@ -19,10 +21,17 @@ export const leftPanelSlice = createSlice({
     setSelectAutocompleteData: (state, action) => {
       state.selectAutocompleteData = action.payload;
     },
+    setRouteType: (state, action) => {
+      if (action.payload === null) {
+        state.routeType = "none";
+      } else {
+        state.routeType = action.payload;
+      }
+    },
   },
 });
 
-export const { setSelectAutocompleteData } = leftPanelSlice.actions;
+export const { setSelectAutocompleteData, setRouteType } = leftPanelSlice.actions;
 
 export const selectMap = (state: RootState) => state.mainmap.value;
 

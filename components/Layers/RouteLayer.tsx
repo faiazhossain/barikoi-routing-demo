@@ -11,120 +11,36 @@ const DeckGLOverlay = (props: any) => {
 };
 
 const RouteLayer = () => {
-  const osrmVanilla = useAppSelector(
-    (state) => state?.layerSlice?.osrmVanilla ?? null
-  );
-  const osrmKenya = useAppSelector(
-    (state) => state?.layerSlice?.osrmKenya ?? null
-  );
+  const allRoutes = useAppSelector((state) => state?.layerSlice?.allRoutes ?? []);
 
-  const OsrmVanilla =
-    osrmVanilla?.routes?.length > 0 ? osrmVanilla?.routes[0]?.geometry : null;
+  
+ 
 
-  console.log("🚀 ~ RouteLayer ~ OsrmVanilla:", OsrmVanilla);
+  // console.log("🚀 ~ RouteLayer ~ OsrmVanilla:", OsrmVanilla);
+  // console.log("🚀 ~ RouteLayer ~ geoJsonDataGoogle:", geoJsonDataGoogle);
+  console.log(allRoutes);
   // const geoJsonDataGoogle = googleData?.decodedPolyline
   //   ? googleData?.decodedPolyline
   //   : null;
 
-  const layers = [
-    new GeoJsonLayer({
-      id: "geojson-layer1",
-      data: OsrmVanilla,
-      pickable: true,
-      stroked: true,
-      filled: true,
-      extruded: true,
-      pointType: "circle",
-      lineWidthScale: 44,
-      lineWidthMaxPixels: 10,
-      lineWidthMinPixels: 8,
-      // strokeColor: [55, 103, 210],
-      getLineColor: [55, 103, 210],
-      getPointRadius: 100,
-      getLineWidth: 4,
-      getElevation: 30,
-      wireframe: true,
-    }),
-
-    new GeoJsonLayer({
-      id: "geojson-layer2",
-      data: OsrmVanilla,
-      pickable: true,
-      stroked: true,
-      filled: true,
-      extruded: true,
-      pointType: "circle",
-      lineWidthScale: 20,
-      lineWidthMaxPixels: 5,
-      lineWidthMinPixels: 3,
-      getLineColor: [44, 176, 254],
-      getPointRadius: 100,
-      getLineWidth: 4,
-      getElevation: 30,
-      wireframe: true,
-    }),
-
-    // // distance matrix layers for kenya
-    // new GeoJsonLayer({
-    //   id: "geojson-layer3",
-    //   data: geoJsonDataKenya,
-    //   pickable: true,
-    //   stroked: true,
-    //   filled: true,
-    //   extruded: true,
-    //   pointType: "circle",
-    //   lineWidthScale: 20,
-    //   lineWidthMaxPixels: 8,
-    //   lineWidthMinPixels: 6,
-    //   // strokeColor: [55, 103, 210],
-    //   getLineColor: [0, 100, 0],
-    //   getPointRadius: 100,
-    //   getLineWidth: 22,
-    //   getElevation: 30,
-    //   wireframe: true,
-    //   opacity: 0.8,
-    // }),
-
-    // new GeoJsonLayer({
-    //   id: "geojson-layer4",
-    //   data: geoJsonDataKenya,
-    //   pickable: true,
-    //   stroked: true,
-    //   filled: true,
-    //   extruded: true,
-    //   pointType: "circle",
-    //   lineWidthScale: 20,
-    //   lineWidthMaxPixels: 5,
-    //   lineWidthMinPixels: 3,
-    //   getLineColor: [0, 255, 0],
-    //   getPointRadius: 100,
-    //   getLineWidth: 4,
-    //   getElevation: 30,
-    //   wireframe: true,
-    //   opacity: 0.6,
-    // }),
-
-    // // distance matrix layers for Google
-    // new GeoJsonLayer({
-    //   id: "geojson-layer5",
-    //   data: geoJsonDataGoogle,
-    //   pickable: true,
-    //   stroked: true,
-    //   filled: true,
-    //   extruded: true,
-    //   pointType: "circle",
-    //   lineWidthScale: 16,
-    //   lineWidthMaxPixels: 6,
-    //   lineWidthMinPixels: 4,
-    //   // strokeColor: [55, 103, 210],
-    //   getLineColor: [255, 0, 0],
-    //   getPointRadius: 100,
-    //   getLineWidth: 22,
-    //   getElevation: 30,
-    //   wireframe: true,
-    //   opacity: 0.8,
-    // }),
-  ];
+  const layers = allRoutes.map((route, index) => new GeoJsonLayer({
+    id: `geojson-layer${index}`,
+    data: route,
+    pickable: true,
+    stroked: true,
+    filled: true,
+    extruded: true,
+    pointType: "circle",
+    lineWidthScale: 50 - index * 8,
+    lineWidthMaxPixels: 5,
+    lineWidthMinPixels: 3,
+    getLineColor: route.lineColor || [0, 255, 0], // Fallback to a default color if lineColor is not defined
+    getPointRadius: 100,
+    getLineWidth: 4,
+    getElevation: 30,
+    wireframe: true,
+    opacity: 0.6,
+  }));
 
   return (
     <div>
